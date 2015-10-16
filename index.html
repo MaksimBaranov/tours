@@ -1,5 +1,5 @@
-<!doctype html>
-<html ng-app="Tours">
+<!DOCTYPE html>
+<html ng-app="Tours" lang="en">
 <head>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.7/angular.min.js"></script>
@@ -7,17 +7,13 @@
 </head>
 <body ng-controller="ToursController">
   <div class="container">
-    <div class="header-block">
-      <div class="label">
-        <a href="/">{{labelName}}</a>
-      </div>
-      <nav>
-        <button>Add New Tour</button>
-      </nav>
+    <div class="navbar header-block">
+      <a href="#" class="brand">{{labelName}}</a>
+      <a href="#"class="btn btn-success pull-right">Add New Tour</a>
     </div>
-    <div class="content-block">
-      <div class="add-tour-block">
-        <form class="add-new-tour">
+    <div class="row-fluid content-block">
+      <div class="row-fluid manage-tour-block">
+        <form class="span4">
           <label for="title">Title:</label><br />
           <input name="title" id="title"><br />
           <label for="country">Country:</label><br />
@@ -33,26 +29,10 @@
           <div class="tour-content-block">
             <img src="">
             <div class="tour-saved-info">
-              <div class="tour-title"> {{tour.title}} </div>
-              <div class="tour-country"> {{tour.country}} </div>
-              <div class="tour-price"> {{tour.price}} </div>
-              <div class="tour-text"> {{tour.text}} </div>
-            </div>
-            <div class="edit-tour-block">
-              <form class="edit-tour">
-                <div class="tour-title">
-                  <input name="edit-title" id="edit-title">
-                </div>
-                <div class="tour-country">
-                  <input name="edit-country" id="edit-country">
-                </div>
-                <div class="tour-price">
-                  <input name="edit-title" id="edit-title">
-                </div>
-                <div class="tour-text">
-                  <input name="edit-text">
-                </div>
-              </form>
+              <div class="tour-title">{{tour.title}}</div>
+              <div class="tour-country">{{tour.country}}</div>
+              <div class="tour-price">{{tour.price}}</div>
+              <div class="tour-text">{{tour.text}}</div>
             </div>
           </div>
           <div class="tour-controls-bar">
