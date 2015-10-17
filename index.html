@@ -13,38 +13,44 @@
     </div>
     <div class="row-fluid content-block">
       <div class="row-fluid manage-tour-block">
+
         <form class="span4">
           <label for="title">Title:</label><br />
-          <input name="title" id="title"><br />
+          <input name="title" id="title" class="form-control" ng-model="newTour.title"><br />
           <label for="country">Country:</label><br />
-          <input name="country" id="country"><br />
+          <input name="country" id="country" class="form-control" ng-model="newTour.country"><br />
           <label for="text">Text:</label><br />
-          <textarea name="text" id="text"></textarea><br />
+          <textarea name="text" id="text" class="form-control" ng-model="newTour.text"></textarea><br />
           <label for="price">Price:</label><br />
-          <input name="price" id="price"><br />
+          <input name="price" id="price" class="form-control" ng-model="newTour.price"><br />
+          <button ng-click="addTour()" class="btn btn-primary">Save</button>
+          <button class="btn btn-primary">Cancel</button>
         </form>
+
       </div>
       <div class="tours-list-block">
-        <div class="tour-block">
-          <div class="tour-content-block">
+        <div ng-repeat="tour in tours" class="tour-block">
+          <div ng-show="tour.is_modified==false" class="tour-content-block">
             <img src="">
             <div class="tour-saved-info">
               <div class="tour-title">{{tour.title}}</div>
               <div class="tour-country">{{tour.country}}</div>
               <div class="tour-price">{{tour.price}}</div>
               <div class="tour-text">{{tour.text}}</div>
+              <a ng-click="editTour(tour)" href="#">Edit Tour</a>
+              <a ng-click="deleteTour($index)" href="#">Delete Tour</a>
             </div>
           </div>
-          <div class="tour-controls-bar">
-            <div class="edit-btns-block">
-              <a href="#">Edit Tour</a>
-              <a href="#">Delete Tour</a>
-            </div>
-            <div>
-              <button>Save</button>
-              <button>Cancel</button>
-            </div>
+
+          <div ng-show="tour.is_modified==true">
+            <input ng-model="tour.title">
+            <input ng-model="tour.country">
+            <input ng-model="tour.description">
+            <input ng-model="tour.price">
+            <button ng-click="saveTour(tour)">Save</button>
+            <button ng-click="cancelEdit(tour)">Cancel</button>
           </div>
+
         </div>
       </div>
     </div>
