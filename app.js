@@ -22,11 +22,11 @@ app.controller('ToursController', function($scope){
   // CRUD actions:
   $scope.new = function() {
     $scope.showForm = true;
-    $scope.newTour = {};
   }
 
   $scope.create = function() {
     $scope.tours.push(angular.copy($scope.newTour));
+    $scope.newTour = {};
     $scope.showForm = false;
     localStorage.setItem("tours", JSON.stringify($scope.tours));
   };
@@ -59,7 +59,7 @@ app.controller('ToursController', function($scope){
     }
   };
 
-  function = initItems() {
+  function initItems() {
     if (localStorage['tours']) {
       $scope.tours = JSON.parse(localStorage['tours'])
     } else {
