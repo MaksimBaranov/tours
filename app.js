@@ -58,14 +58,13 @@ app.controller('ToursController', function($scope){
       country: null,
       description: null,
       price: null,
-      isModified: null
+      isModified: false
     }
   };
 
   function store() { localStorage.setItem("tours", JSON.stringify($scope.tours)); }
 
   $scope.revertedVersion = emptyTour();
-
   initItems();
 });
 
