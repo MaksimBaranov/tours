@@ -3,12 +3,14 @@ var app = angular.module('Tours', []);
 app.controller('ToursController', function($scope){
   $scope.labelName = 'Tours';
 
-  $scope.newTour = {
-    title: null,
-    country: null,
-    description: null,
-    price: null,
-    is_modified: false
+  function emptyTour() {
+    return {
+      title: null,
+      country: null,
+      description: null,
+      price: null,
+      isModified: false
+    }
   };
 
   $scope.revertedVersion = {
@@ -16,17 +18,18 @@ app.controller('ToursController', function($scope){
     country: null,
     description: null,
     price: null,
-    is_modified: null
+    isModified: null
   };
 
   // CRUD actions:
   $scope.new = function() {
+    $scope.newTour  = emptyTour();
     $scope.showForm = true;
   }
 
   $scope.create = function() {
     $scope.tours.push(angular.copy($scope.newTour));
-    $scope.newTour = {};
+    $scope.newTour = emptyTour();
     $scope.showForm = false;
     localStorage.setItem("tours", JSON.stringify($scope.tours));
   };
@@ -38,25 +41,25 @@ app.controller('ToursController', function($scope){
 
   $scope.edit = function(tour) {
     $scope.revertedVersion = angular.copy(tour);
-    tour.is_modified = true;
+    tour.isModified = true;
   };
 
   $scope.update = function(tour) {
-    tour.is_modified = false;
+    tour.isModified = false;
     $scope.showForm = false;
     localStorage.setItem("tours", JSON.stringify($scope.tours));
   };
 
-  $scope.cancel = function(tour) {
-    if (tour != null) {
-      tour.title = $scope.revertedVersion.title;
-      tour.country = $scope.revertedVersion.country;
-      tour.description = $scope.revertedVersion.description;
-      tour.price = $scope.revertedVersion.price;
-      tour.is_modified = false;
-    } else {
-      $scope.showForm = false;
-    }
+  $scope.cancelEdit = function(tour) {
+    tour.title = $scope.revertedVersion.title;
+    tour.country = $scope.revertedVersion.country;
+    tour.description = $scope.revertedVersion.description;
+    tour.price = $scope.revertedVersion.price;
+    tour.isModified = false;
+  };
+
+  $scope.cancelNewTour = function() {
+    $scope.showForm = false;
   };
 
   function initItems() {
