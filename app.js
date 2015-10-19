@@ -3,24 +3,6 @@ var app = angular.module('Tours', []);
 app.controller('ToursController', function($scope){
   $scope.labelName = 'Tours';
 
-  function emptyTour() {
-    return {
-      title: null,
-      country: null,
-      description: null,
-      price: null,
-      isModified: false
-    }
-  };
-
-  $scope.revertedVersion = {
-    title: null,
-    country: null,
-    description: null,
-    price: null,
-    isModified: null
-  };
-
   // CRUD actions:
   $scope.new = function() {
     $scope.newTour  = emptyTour();
@@ -31,12 +13,12 @@ app.controller('ToursController', function($scope){
     $scope.tours.push(angular.copy($scope.newTour));
     $scope.newTour = emptyTour();
     $scope.showForm = false;
-    localStorage.setItem("tours", JSON.stringify($scope.tours));
+    store();
   };
 
   $scope.destroy = function(index) {
     $scope.tours.splice(index, 1);
-    localStorage.setItem("tours", JSON.stringify($scope.tours));
+    store();
   };
 
   $scope.edit = function(tour) {
@@ -47,7 +29,7 @@ app.controller('ToursController', function($scope){
   $scope.update = function(tour) {
     tour.isModified = false;
     $scope.showForm = false;
-    localStorage.setItem("tours", JSON.stringify($scope.tours));
+    store();
   };
 
   $scope.cancelEdit = function(tour) {
@@ -69,6 +51,20 @@ app.controller('ToursController', function($scope){
       $scope.tours = [];
     }
   };
+
+  function emptyTour() {
+    return {
+      title: null,
+      country: null,
+      description: null,
+      price: null,
+      isModified: null
+    }
+  };
+
+  function store() { localStorage.setItem("tours", JSON.stringify($scope.tours)); }
+
+  $scope.revertedVersion = emptyTour();
 
   initItems();
 });
