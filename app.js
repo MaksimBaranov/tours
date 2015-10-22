@@ -1,11 +1,11 @@
-angular.module('Tours', ['ngRoute'])
-.config(function($routeProvider)) {
+angular.module('Tours',  ['ngRoute'])
+.config(function($routeProvider) {
   $routeProvider
   .when('/',{
     templateUrl: "views/tours/index.html",
-    contoller: 'tours_controller'
+    controller: 'ToursController'
   })
-}
+})
 
 
 

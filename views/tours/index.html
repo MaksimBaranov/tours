@@ -1,0 +1,49 @@
+<div class="navbar header-block">
+  <a ng-href="/#/" class="brand">{{labelName}}</a>
+  <a ng-href="/#/" ng-click="new()" class="btn btn-primary pull-right">Create New Tour</a>
+</div>
+<hr>
+<div class="row-fluid content-block">
+<div class="row-fluid manage-tour-block">
+<form ng-Show="showForm" class="col-md-12">
+<div class="form-group col-md-4 col-md-offset-4">
+<label for="title">Title:</label><br />
+<input name="title" id="title" class="form-control" ng-model="newTour.title"><br />
+<label for="country">Country:</label><br />
+<input name="country" id="country" class="form-control" ng-model="newTour.country"><br />
+<label for="text">Text:</label><br />
+<textarea name="text" id="text" class="form-control" ng-model="newTour.description"></textarea><br />
+<label for="price">Price:</label><br />
+<input name="price" id="price" class="form-control" ng-model="newTour.price"><br />
+<button ng-click="create()" class="btn btn-primary">Save</button>
+<button ng-click="cancelNewTour()" class="btn btn-warning">Cancel</button>
+</div>
+</form>
+</div>
+<div class="tours-list-block">
+<div ng-repeat="tour in tours track by $index" class="tour-block media">
+<a class = "pull-left" href = "#">
+<img class = "media-object" src = "http://placehold.it/64x64" alt = "Media Object">
+</a>
+<div ng-show="tour.isModified==false" class="tour-content-block media-body">
+<div class="tour-saved-info">
+<h4 class="media-heading tour-title">{{tour.title}}</h4>
+<div class="tour-country">{{tour.country}}</div>
+<div class="tour-price">{{tour.price}}</div>
+<div class="tour-text">{{tour.description}}</div>
+<button ng-click="edit(tour)" class="btn btn-success">Edit Tour</button>
+<button ng-click="destroy($index)" class="btn btn-danger">Delete Tour</button>
+</div>
+</div>
+<div ng-show="tour.isModified==true" class="media-body">
+<input ng-model="tour.title" class="form-control">
+<input ng-model="tour.country" class="form-control">
+<input ng-model="tour.price" class="form-control">
+<textarea ng-model="tour.description" class="form-control"></textarea><br />
+<button ng-click="update(tour)" class="btn btn-success">Save</button>
+<button ng-click="cancelEdit(tour)" class="btn btn-warning">Cancel</button>
+</div>
+</div>
+</div>
+</div>
+<div class="footer-block"></div>
