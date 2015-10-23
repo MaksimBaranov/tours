@@ -1,4 +1,5 @@
-angular.module('Tours').controller('ToursController', function($scope){
+angular.module('tours').controller('ToursController', function($scope, $location, currentUser){
+  console.log(currentUser);
   $scope.labelName = 'Tours';
 
   // CRUD actions:
@@ -8,6 +9,7 @@ angular.module('Tours').controller('ToursController', function($scope){
   }
 
   $scope.create = function() {
+    $scope.newTour.slug = $scope.newTour.country
     $scope.tours.push(angular.copy($scope.newTour));
     $scope.newTour = emptyTour();
     $scope.showForm = false;
@@ -35,6 +37,7 @@ angular.module('Tours').controller('ToursController', function($scope){
     tour.country = $scope.revertedVersion.country;
     tour.description = $scope.revertedVersion.description;
     tour.price = $scope.revertedVersion.price;
+    tour.slug = $scope.revertedVersion.slug;
     tour.isModified = false;
   };
 
@@ -56,6 +59,7 @@ angular.module('Tours').controller('ToursController', function($scope){
       country: null,
       description: null,
       price: null,
+      slug: null,
       isModified: false
     }
   };

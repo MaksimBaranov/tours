@@ -27,7 +27,9 @@
 </a>
 <div ng-show="tour.isModified==false" class="tour-content-block media-body">
 <div class="tour-saved-info">
-<h4 class="media-heading tour-title">{{tour.title}}</h4>
+<h4 class="media-heading tour-title">
+  <a ng-href="/#/tour/{{tour.slug}}">{{tour.title}}</a>
+</h4>
 <div class="tour-country">{{tour.country}}</div>
 <div class="tour-price">{{tour.price}}</div>
 <div class="tour-text">{{tour.description}}</div>
