@@ -6,13 +6,27 @@
   <title>Tours</title>
 </head>
 <body>
+  <nav class="navbar navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <a ng-href="/" class="navbar-brand">Tours</a>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a ng-href="/admin/tours">Admin tours</a></li>
+            <li><a ng-href="/admin/countries">Admin countries</a></li>
+          </ul>
+      </div>
+    </div>
+  </nav>
   <div class="container">
     <ng-view></ng-view>
   </div>
+  <div class="footer-block"></div>
   <script src="https://code.angularjs.org/1.4.4/angular.js"></script>
   <script src="https://code.angularjs.org/1.4.4/angular-route.js"></script>
   <script src="app.js" type="text/javascript"></script>
   <script src="tours_controller.js" type="text/javascript"></script>
   <script src="tour_controller.js" type="text/javascript"></script>
+  <script src="controllers/admin/tours_controller.js" type="text/javascript"></script>
+  <script src="controllers/admin/countries_controller.js" type="text/javascript"></script>
 </body>
 </html>
