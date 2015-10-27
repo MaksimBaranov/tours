@@ -1,0 +1,26 @@
+<h1>{{ pageName }}</h1>
+<select ng-model="filter.country">
+  <option ng-repeat="country in countries" value="{{ country.name }}">{{ country.name }}</option>
+</select>
+<br />
+<hr>
+<div class="row-fluid content-block">
+  <div class="tours-list-block">
+    <div ng-repeat="tour in tours | filter:{'country': filter.country} track by $index" class="tour-block media">
+      <a class = "pull-left" ng-href = "#">
+        <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
+      </a>
+      <div class="tour-content-block media-body">
+      <div class="tour-saved-info">
+        <h4 class="media-heading tour-title">
+          <a ng-href="/#/tour/{{tour.slug}}">{{tour.title}}</a>
+        </h4>
+        <div class="tour-country">{{tour.country}}</div>
+        <div class="tour-price">{{tour.price | currency}}</div>
+        <div class="tour-text">{{tour.description | limitTo:20}}{{tour.description.length > 20 ? '...' : ''}}</div>
+      </div>
+      <hr>
+    </div>
+  </div>
+</div>
+

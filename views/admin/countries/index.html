@@ -1,0 +1,34 @@
+  <h1>{{ pageName }}</h1>
+  <a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Country</a>
+  <br>
+<hr>
+<div class="row-fluid content-block">
+  <form ng-Show="showForm">
+    <div class="form-group col-md-4 col-md-offset-4">
+      <label for="title">Title:</label><br />
+      <input name="name" id="name" class="form-control" ng-model="newCountry.name"><br />
+      <button ng-click="create()" class="btn btn-primary">Save</button>
+      <button ng-click="cancelNewCountry()" class="btn btn-warning">Cancel</button>
+    </div>
+  </form>
+  <div class="countries-list-block col-md-12">
+    <div ng-repeat="country in countries track by $index" class="country-block media">
+      <a class="pull-left" href = "#">
+        <img class = "media-object" ng-src = "http://placehold.it/64x64" alt = "Media Object">
+      </a>
+
+      <div ng-show="country.isModified==false" class="country-content-block media-body">
+          <h4 class="media-heading country-name">{{country.name}}
+          </h4>
+          <button ng-click="edit(country)" class="btn btn-success">Edit Tour</button>
+          <button ng-click="destroy($index)" class="btn btn-danger">Delete Tour</button>
+      </div>
+      <div ng-show="country.isModified==true" class="media-body">
+        <input ng-model="country.name" class="form-control">
+        <button ng-click="update(country)" class="btn btn-success">Save</button>
+        <button ng-click="cancelEdit(country)" class="btn btn-warning">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
