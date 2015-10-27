@@ -17,10 +17,7 @@ angular.module('tours',  ['ngRoute'])
     templateUrl: "/views/tours/show.html",
     controller: "TourController"
   }).otherwise({
-    // redirectTo: '/'
-    redirectTo: function() {
-        window.location = "/404.html";
-    }
+   templateUrl: '404.html'
   })
 
   $locationProvider.html5Mode(true);
