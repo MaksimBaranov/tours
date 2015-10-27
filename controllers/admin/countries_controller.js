@@ -1,5 +1,4 @@
 angular.module('tours').controller('AdminCountriesController', function($scope, $location){
-  debugger;
   $scope.pageName = 'Admin Countries';
 
   // CRUD actions
