@@ -1,6 +1,16 @@
-angular.module('tours').controller('AdminCountriesController', function($scope, $location){
-  debugger;
+angular.module('tours').controller('AdminCountriesController', function($scope, $location, $http){
   $scope.pageName = 'Admin Countries';
+
+
+  $http.get(
+    'https://api.parse.com/1/classes/countries'
+  ).then(
+    function(response) {
+      $scope.countries = response.data.results;
+    }, function(errResponse) {
+      console.log(errResponse);
+    }
+  )
 
   // CRUD actions
   $scope.new = function() {
@@ -51,5 +61,5 @@ angular.module('tours').controller('AdminCountriesController', function($scope, 
   function store() { localStorage.setItem("countries", JSON.stringify(allCountries)); }
 
   $scope.revertedVersion = emptyCountry();
-  $scope.countries = allCountries;
+
 });

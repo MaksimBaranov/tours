@@ -1,6 +1,9 @@
-angular.module('tours').controller('TourController', function($scope, $routeParams){
+angular.module('tours').controller('TourController', function($scope, $routeParams, $resource){
 
-  angular.forEach(allTours, function(tour) {
-    if ($routeParams.slug == tour.slug) { $scope.tour = tour; }
-  })
+  var Tour = $resource(
+ 	'https://api.parse.com/1/classes/tours/:objectId',
+ 	{objectId: '@objectId'}
+  )
+
+  $scope.tour = Tour.get({objectId: $routeParams.id})
 });

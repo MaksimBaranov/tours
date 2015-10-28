@@ -1,6 +1,29 @@
-angular.module('tours').controller('AdminToursController', function($scope, $location){
+angular.module('tours').controller('AdminToursController', function($scope, $location, $http){
   $scope.pageName = 'Admin Tours';
+  
+  $http.get(
+    'https://api.parse.com/1/classes/tours'
+  ).then(
+    function(response) {
+      $scope.tours = response.data.results;
+    }, function(errResponse) {
+      console.log(errResponse);
+    }
+  )
+
+  $http.get(
+    'https://api.parse.com/1/classes/countries'
+  ).then(
+    function(response) {
+      $scope.countries = response.data.results;
+    }, function(errResponse) {
+      console.log(errResponse);
+    }
+  )  
+
   $scope.filter = {};
+
+
 
   // CRUD actions
   $scope.new = function() {
@@ -61,6 +84,4 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
 
   // Init Objects
   $scope.revertedVersion = emptyTour();
-  $scope.tours = allTours;
-  $scope.countries = allCountries;
 });

@@ -1,5 +1,5 @@
-angular.module('tours',  ['ngRoute'])
-.config(function($routeProvider, $locationProvider) {
+angular.module('tours',  ['ngRoute', 'ngResource'])
+.config(function($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
   .when('/admin/tours', {
     templateUrl: "/views/admin/tours/index.html",
@@ -13,21 +13,21 @@ angular.module('tours',  ['ngRoute'])
     templateUrl: "/views/tours/index.html",
     controller: 'ToursController'
   })
-  .when('/tour/:slug', {
+  .when('/tour/:id', {
     templateUrl: "/views/tours/show.html",
     controller: "TourController"
   }).otherwise({
-    // redirectTo: '/'
-    redirectTo: function() {
-        window.location = "/404.html";
-    }
+    templateUrl: '/404.html'
   })
 
   $locationProvider.html5Mode(true);
-});
 
-var allTours = JSON.parse(localStorage['tours']) || [];
-var allCountries = JSON.parse(localStorage['countries']) || [];
+  $httpProvider.defaults.headers.common = {
+    "X-Parse-Application-Id": "ZIRIkCOLK21MS6Us2FQRzYp7GkD2YD9IcdiAAqS8",
+    "X-Parse-REST-API-Key": "ggk5tVA6hSyGQ2Fpi628lpmx3irmuESExdgzezLe"
+  };
+
+});
 
 
 
