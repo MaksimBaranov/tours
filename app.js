@@ -9,6 +9,10 @@ angular.module('tours',  ['ngRoute', 'ngResource'])
     templateUrl: '/views/admin/countries/index.html',
     controller: 'AdminCountriesController'
   })
+  .when('/admin/places', {
+    templateUrl: '/views/admin/places/index.html',
+    controller: 'AdminPlacesController'
+  })
   .when('/',{
     templateUrl: "/views/tours/index.html",
     controller: 'ToursController'
@@ -26,7 +30,6 @@ angular.module('tours',  ['ngRoute', 'ngResource'])
     "X-Parse-Application-Id": "ZIRIkCOLK21MS6Us2FQRzYp7GkD2YD9IcdiAAqS8",
     "X-Parse-REST-API-Key": "ggk5tVA6hSyGQ2Fpi628lpmx3irmuESExdgzezLe"
   };
-
 });
 
 

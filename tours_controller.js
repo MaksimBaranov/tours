@@ -19,6 +19,13 @@ angular.module('tours').controller('ToursController', function($scope, $resource
     {query: {isArray: true, transformResponse: parseServerResults}}
   )
 
-$scope.tours = Tour.query();
-$scope.countries = Country.query();
+  var Place = $resource(
+    'https://api.parse.com/1/classes/places/:objectId',
+    {objectId: '@objectId'},
+    {query: {isArray: true, transformResponse: parseServerResults}}
+  )
+
+  $scope.tours = Tour.query();
+  $scope.countries = Country.query();
+  $scope.places = Place.query();
 });

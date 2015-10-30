@@ -1,0 +1,34 @@
+  <h1>{{ pageName }}</h1>
+  <a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Place</a>
+  <br>
+<hr>
+<div class="row-fluid content-block">
+  <form ng-Show="showForm">
+    <div class="form-group col-md-4 col-md-offset-4">
+      <label for="title">Title:</label><br />
+      <input name="name" id="name" class="form-control" ng-model="newPlace.name"><br />
+      <button ng-click="create()" class="btn btn-primary">Save</button>
+      <button ng-click="cancelNewPlace()" class="btn btn-warning">Cancel</button>
+    </div>
+  </form>
+  <div class="places-list-block col-md-12">
+    <div ng-repeat="place in places track by $index" class="place-block media">
+      <a class="pull-left" href = "#">
+        <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
+      </a>
+
+      <div ng-show="place.isModified !=true" class="place-content-block media-body">
+          <h4 class="media-heading place-name">{{place.name}}
+          </h4>
+          <button ng-click="edit($index, place)" class="btn btn-success">Edit Tour</button>
+          <button ng-click="destroy($index, place)" class="btn btn-danger">Delete Tour</button>
+      </div>
+      <div ng-show="place.isModified==true" class="media-body">
+        <input ng-model="place.name" class="form-control"><br />
+        <button ng-click="update(place)" class="btn btn-success">Save</button>
+        <button ng-click="cancelEdit($index, place)" class="btn btn-warning">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+

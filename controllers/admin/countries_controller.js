@@ -1,65 +1,83 @@
-angular.module('tours').controller('AdminCountriesController', function($scope, $location, $http){
+angular.module('tours').controller('AdminCountriesController', function($scope, $location, $resource){
   $scope.pageName = 'Admin Countries';
 
-
-  $http.get(
-    'https://api.parse.com/1/classes/countries'
-  ).then(
-    function(response) {
-      $scope.countries = response.data.results;
-    }, function(errResponse) {
-      console.log(errResponse);
+  var Country = $resource(
+    'https://api.parse.com/1/classes/countries/:objectId',
+    {objectId: '@objectId'},
+    {
+      query: {isArray: true, transformResponse: parseServerResults},
+      update: {method: 'PUT'}
     }
-  )
+  );
+
+  $scope.countries = Country.query();
+
+  $scope.backupCountriesCollection = [];
 
   // CRUD actions
   $scope.new = function() {
     $scope.newCountry  = emptyCountry();
     $scope.showForm = true;
-  }
+  };
 
   $scope.create = function() {
-    $scope.countries.push(angular.copy($scope.newCountry));
-    $scope.newCountry = emptyCountry();
-    $scope.showForm = false;
-    store();
+    var countryToServer = new Country($scope.newCountry);
+
+    countryToServer.$save().then(
+      function(country) {
+        var countryFromServer = angular.extend(country, $scope.newCountry);
+        $scope.countries.push(countryFromServer);
+        $scope.newCountry = emptyCountry();
+        $scope.showForm = false;
+      }
+    );
   };
 
-  $scope.destroy = function(index) {
-    $scope.countries.splice(index, 1);
-    store();
-  };
-
-  $scope.edit = function(country) {
-    $scope.revertedVersion = angular.copy(country);
+  $scope.edit = function(index, country) {
+    putCountryToBackup(index, country);
     country.isModified = true;
   };
 
   $scope.update = function(country) {
-    country.isModified = false;
-    $scope.showForm = false;
-    store();
+    Country.update({objectId: country.objectId}, country);
+    country.isModified = null;
   };
 
-  $scope.cancelEdit = function(country) {
-    country.name = $scope.revertedVersion.name;
-    country.isModified = false;
+  $scope.destroy = function(index, country) {
+    Country.delete({objectId: country.objectId});
+    $scope.countries.splice(index, 1);
+  };
+
+  // Form Helpers
+  $scope.cancelEdit = function(index, country) {
+    getCountryFromBackup(index, country);
+    country.isModified = null;
   };
 
   $scope.cancelNewCountry = function() {
     $scope.showForm = false;
+    $scope.newCountry = emptyCountry();
   };
 
-  // Actions helpers
+  // Actions' helpers
+  function parseServerResults(data, headerGetter) {
+    data = angular.fromJson(data);
+    return data.results;
+  };
+
   function emptyCountry() {
     return {
       name: null,
-      isModified: false
+      isModified: null
     }
   };
 
-  function store() { localStorage.setItem("countries", JSON.stringify(allCountries)); }
+  function putCountryToBackup(index, country) {
+    var backupItem = angular.copy(country);
+    $scope.backupCountriesCollection[index] = backupItem;
+  };
 
-  $scope.revertedVersion = emptyCountry();
-
+  function getCountryFromBackup(index, country) {
+    angular.extend(country, $scope.backupCountriesCollection[index]); 
+  };
 });

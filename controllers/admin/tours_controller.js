@@ -1,29 +1,35 @@
-angular.module('tours').controller('AdminToursController', function($scope, $location, $http){
+angular.module('tours').controller('AdminToursController', function($scope, $location, $resource){
   $scope.pageName = 'Admin Tours';
   
-  $http.get(
-    'https://api.parse.com/1/classes/tours'
-  ).then(
-    function(response) {
-      $scope.tours = response.data.results;
-    }, function(errResponse) {
-      console.log(errResponse);
+  var Tour = $resource(
+    'https://api.parse.com/1/classes/tours/:objectId',
+    {objectId: '@objectId'},
+    {
+      query: {isArray: true, transformResponse: parseServerResults},
+      update: {method: 'PUT'}
     }
+  );
+
+  var Country = $resource(
+    'https://api.parse.com/1/classes/countries/:objectId',
+    {objectId: '@objectId'},
+    {
+      query: {isArray: true, transformResponse: parseServerResults}
+    }
+  );
+
+   var Place = $resource(
+    'https://api.parse.com/1/classes/places/:objectId',
+    {objectId: '@objectId'},
+    {query: {isArray: true, transformResponse: parseServerResults}}
   )
 
-  $http.get(
-    'https://api.parse.com/1/classes/countries'
-  ).then(
-    function(response) {
-      $scope.countries = response.data.results;
-    }, function(errResponse) {
-      console.log(errResponse);
-    }
-  )  
+  $scope.tours = Tour.query();
+  $scope.countries = Country.query();
+  $scope.places = Place.query();
 
   $scope.filter = {};
-
-
+  $scope.backupToursCollection = [];
 
   // CRUD actions
   $scope.new = function() {
@@ -32,56 +38,70 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   };
 
   $scope.create = function() {
-    $scope.newTour.slug = $scope.newTour.country
-    $scope.tours.push(angular.copy($scope.newTour));
-    $scope.newTour = emptyTour();
-    $scope.showForm = false;
-    store();
+    $scope.newTour.slug = $scope.newTour.country;
+    var tourToServer = new Tour($scope.newTour);
+
+    tourToServer.$save().then(
+      function(tour) {
+        var tourFromServer = angular.extend(tour, $scope.newTour);
+        $scope.tours.push(tourFromServer);
+        $scope.newTour = emptyTour();
+        $scope.showForm = false;
+      }
+    );
   };
 
-  $scope.destroy = function(index) {
-    $scope.tours.splice(index, 1);
-    store();
-  };
-
-  $scope.edit = function(tour) {
-    $scope.revertedVersion = angular.copy(tour);
+  $scope.edit = function(index, tour) {
+    putTourToBackup(index, tour);
     tour.isModified = true;
   };
 
   $scope.update = function(tour) {
-    tour.isModified = false;
-    $scope.showForm = false;
-    store();
+    Tour.update({objectId: tour.objectId}, tour);
+    tour.isModified = null;
   };
 
-  $scope.cancelEdit = function(tour) {
-    tour.title = $scope.revertedVersion.title;
-    tour.country = $scope.revertedVersion.country;
-    tour.description = $scope.revertedVersion.description;
-    tour.price = $scope.revertedVersion.price;
-    tour.slug = $scope.revertedVersion.slug;
-    tour.isModified = false;
+  $scope.destroy = function(index, tour) {
+    Tour.delete({objectId: tour.objectId});
+    $scope.tours.splice(index, 1);
+  };
+
+  // Form Helpers
+  $scope.cancelEdit = function(index, tour) {
+    getTourFromBackup(index, tour);
+    tour.isModified = null;
   };
 
   $scope.cancelNewTour = function() {
     $scope.showForm = false;
+    $scope.newTour = emptyTour();
   };
 
-  // Actions helpers
+  // Actions' helpers
+  function parseServerResults(data, headerGetter) {
+    data = angular.fromJson(data);
+    return data.results;
+  };
+
   function emptyTour() {
     return {
       title: null,
       country: null,
+      place: null,
       description: null,
       price: null,
+      duration:null,
       slug: null,
-      isModified: false
+      isModified: null
     }
   };
 
-  function store() { localStorage.setItem("tours", JSON.stringify(allTours)); }
+  function putTourToBackup(index, tour) {
+    var backupItem = angular.copy(tour);
+    $scope.backupToursCollection[index] = backupItem;
+  };
 
-  // Init Objects
-  $scope.revertedVersion = emptyTour();
+  function getTourFromBackup(index, tour) {
+    angular.extend(tour, $scope.backupToursCollection[index]); 
+  };
 });
