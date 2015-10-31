@@ -1,7 +1,6 @@
 angular.module('tours').controller('AdminCountriesController', function($scope, $location, $http){
   $scope.pageName = 'Admin Countries';
 
-
   $http.get(
     'https://api.parse.com/1/classes/countries'
   ).then(
