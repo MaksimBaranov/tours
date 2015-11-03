@@ -1,13 +1,13 @@
 <h1>{{ pageName }}</h1>
-  <select ng-model="filter.country">
-    <option></option>
-    <option ng-repeat="country in countries" value="{{ country.name }}">{{ country.name }}</option>
-  </select>
-  <select ng-model="filter.place">
-    <option></option>
-    <option ng-repeat="place in places" value="{{ place.name }}">{{ place.name }}</option>
-  </select>
-  <a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Tour</a>
+<select ng-model="filter.country">
+  <option></option>
+  <option ng-repeat="country in countries" value="{{ country.objectId }}">{{ country.name }}</option>
+</select>
+<select ng-model="filter.place">
+  <option></option>
+  <option ng-repeat="place in places | filter:filter.country" value="{{ place.objectId }}">{{ place.name }}</option>
+</select>
+<a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Tour</a>
 <hr>
 <div class="row-fluid content-block">
   <form ng-Show="showForm">
@@ -34,7 +34,7 @@
     </div>
   </form>
   <div class="tours-list-block col-md-12">
-    <div ng-repeat="tour in tours | filter:{'country': filter.country, 'place': filter.place} track by $index" class="tour-block media">
+    <div ng-repeat="tour in tours | filter:{'countryObjectId': filter.country, 'placeObjectId': filter.place} track by $index" class="tour-block media">
       <a class = "pull-left" href = "#">
         <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
       </a>
