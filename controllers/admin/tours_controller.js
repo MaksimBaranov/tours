@@ -2,7 +2,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   $scope.pageName = 'Admin Tours';
   
   var Tour = $resource(
-    'https://api.parse.com/1/classes/tours/:objectId',
+    'https://api.parse.com/1/classes/tours/:objectId?include=country,place,hotel',
     {objectId: '@objectId'},
     {
       query: {isArray: true, transformResponse: parseServerResults},
@@ -13,13 +13,17 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   var Country = $resource(
     'https://api.parse.com/1/classes/countries/:objectId',
     {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults}
-    }
+    {query: {isArray: true, transformResponse: parseServerResults}}
   );
 
-   var Place = $resource(
+  var Place = $resource(
     'https://api.parse.com/1/classes/places/:objectId',
+    {objectId: '@objectId'},
+    {query: {isArray: true, transformResponse: parseServerResults}}
+  )
+
+  var Hotel = $resource(
+    'https://api.parse.com/1/classes/hotels/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
   )
@@ -27,6 +31,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   $scope.tours = Tour.query();
   $scope.countries = Country.query();
   $scope.places = Place.query();
+  $scope.hotels = Hotel.query();
 
   $scope.filter = {};
   $scope.backupToursCollection = [];
@@ -34,11 +39,21 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   // CRUD actions
   $scope.new = function() {
     $scope.newTour  = emptyTour();
+    $scope.newHotel = emptyHotel();
     $scope.showForm = true;
   };
 
   $scope.create = function() {
-    $scope.newTour.slug = $scope.newTour.country;
+    var hotelToServer = new Hotel($scope.newHotel)
+
+    hotelToServer.$save().then(
+      function(hotel) {
+        var hotelFromServer = angular.extend(hotel, $scope.newHotel);
+        $scope.hotels.push(hotelFromServer);
+        $scope.newTour.hotelObjectId = hotelFromServer.objectId;
+      }
+    );
+
     var tourToServer = new Tour($scope.newTour);
 
     tourToServer.$save().then(
@@ -46,6 +61,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
         var tourFromServer = angular.extend(tour, $scope.newTour);
         $scope.tours.push(tourFromServer);
         $scope.newTour = emptyTour();
+        $scope.newHotel = emptyHotel();
         $scope.showForm = false;
       }
     );
@@ -86,13 +102,20 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   function emptyTour() {
     return {
       title: null,
-      country: null,
-      place: null,
+      hotelObjectId: null,
+      countryObjectId: null,
+      placeObjectId: null,
       description: null,
       price: null,
       duration:null,
-      slug: null,
       isModified: null
+    }
+  };
+
+  function emptyHotel() {
+    return {
+      title: null,
+      stars: null  
     }
   };
 
