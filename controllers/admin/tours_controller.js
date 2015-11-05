@@ -2,7 +2,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   $scope.pageName = 'Admin Tours';
   
   var Tour = $resource(
-    'https://api.parse.com/1/classes/tours/:objectId?include=country,place,hotel',
+    'https://api.parse.com/1/classes/tours/:objectId?include=country,hotel,place',
     {objectId: '@objectId'},
     {
       query: {isArray: true, transformResponse: parseServerResults},
@@ -45,25 +45,28 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
 
   $scope.create = function() {
     var hotelToServer = new Hotel($scope.newHotel)
+    var tourToServer = new Tour($scope.newTour);
 
     hotelToServer.$save().then(
       function(hotel) {
         var hotelFromServer = angular.extend(hotel, $scope.newHotel);
         $scope.hotels.push(hotelFromServer);
-        $scope.newTour.hotelObjectId = hotelFromServer.objectId;
-      }
-    );
+        tourToServer.hotel = hotelFromServer.objectId;
 
-    var tourToServer = new Tour($scope.newTour);
+        tourToServer.$save().then(
+          function(tour) {
+            var tourFromServer = angular.extend(tour, $scope.newTour);
+            $scope.tours.push(tourFromServer);
+            $scope.newTour = emptyTour();
+            $scope.newHotel = emptyHotel();
+            $scope.showForm = false;
+          },
 
-    tourToServer.$save().then(
-      function(tour) {
-        var tourFromServer = angular.extend(tour, $scope.newTour);
-        $scope.tours.push(tourFromServer);
-        $scope.newTour = emptyTour();
-        $scope.newHotel = emptyHotel();
-        $scope.showForm = false;
-      }
+          function(tourSavingError) { alert(tourSavingError); }
+        );
+      },
+
+      function(hotelSavingError) { alert(hotelSavingError); }
     );
   };
 
@@ -102,13 +105,25 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   function emptyTour() {
     return {
       title: null,
-      hotelObjectId: null,
-      countryObjectId: null,
-      placeObjectId: null,
       description: null,
       price: null,
       duration:null,
-      isModified: null
+      isModified: null,
+      place:{
+        __type: 'Pointer',
+        className: 'places',
+        objectId: null
+      },
+      country: {
+        __type: 'Pointer',
+        className: 'countries',
+        objectId: null
+      },
+      hotel: {
+        __type: 'Pointer',
+        className: 'hotels',
+        objectId: null
+      }
     }
   };
 

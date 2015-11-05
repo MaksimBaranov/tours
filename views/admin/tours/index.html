@@ -22,10 +22,10 @@
       <input name="hotel_stars" id="hotel_stars" type="number" class="form-control" ng-model="newHotel.stars"><br />
 
       <label for="country">Country:</label><br />
-      <select ng-model="newTour.country" ng-options="country.name as country.name for country in countries track by country.name" class="form-control"></select><br />
+      <select ng-model="newTour.country" ng-options="country.objectId as country.objectId for country in countries track by country.objectId" class="form-control"></select><br />
 
       <label for="place">Place:</label><br />
-      <select ng-model="newTour.place" ng-options="place.name as place.name for place in places track by place.name" class="form-control"></select><br />
+      <select ng-model="newTour.place" ng-options="place.objectId as place.objectId for place in places track by place.objectId" class="form-control"></select><br />
 
       <label for="text">Text:</label><br />
       <textarea name="text" id="text" class="form-control" ng-model="newTour.description"></textarea><br />
