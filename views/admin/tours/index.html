@@ -22,10 +22,10 @@
       <input name="hotel_stars" id="hotel_stars" type="number" class="form-control" ng-model="newHotel.stars"><br />
 
       <label for="country">Country:</label><br />
-      <select ng-model="newTour.country" ng-options="country.objectId as country.objectId for country in countries track by country.objectId" class="form-control"></select><br />
+      <select ng-model="newTour.country.objectId" ng-options="country.objectId as country.name for country in countries track by country.objectId" class="form-control"></select><br />
 
       <label for="place">Place:</label><br />
-      <select ng-model="newTour.place" ng-options="place.objectId as place.objectId for place in places track by place.objectId" class="form-control"></select><br />
+      <select ng-model="newTour.place.objectId" ng-options="place.objectId as place.name for place in places track by place.objectId" class="form-control"></select><br />
 
       <label for="text">Text:</label><br />
       <textarea name="text" id="text" class="form-control" ng-model="newTour.description"></textarea><br />
@@ -62,8 +62,17 @@
       </div>
       <div ng-show="tour.isModified==true" class="media-body">
         <input ng-model="tour.title" class="form-control">
-        <input ng-model="tour.country" class="form-control">
-        <input ng-model="tour.place" class="form-control">
+
+        <select ng-model="tour.EditedCountryId"  class="form-control">
+          <option ng-repeat="country in countries track by country.objectId" value="{{country.objectId}}" ng-selected="country.objectId == tour.country.objectId"
+            >{{country.name}}</option>
+        </select><br />
+
+        <select ng-model="tour.EditedPlaceId" class="form-control">
+          <option ng-repeat="place in places track by place.objectId" value="{{place.objectId}}" ng-selected="place.objectId == tour.place.objectId">{{place.name}}</option>
+        </select><br />
+
+
         <input ng-model="tour.price" type="number" class="form-control">
         <input ng-model="tour.duration" type="number" class="form-control">
         <textarea ng-model="tour.description" class="form-control"></textarea><br />

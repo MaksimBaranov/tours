@@ -51,7 +51,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
       function(hotel) {
         var hotelFromServer = angular.extend(hotel, $scope.newHotel);
         $scope.hotels.push(hotelFromServer);
-        tourToServer.hotel = hotelFromServer.objectId;
+        tourToServer.hotel.objectId = hotelFromServer.objectId;
 
         tourToServer.$save().then(
           function(tour) {
@@ -72,10 +72,29 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
 
   $scope.edit = function(index, tour) {
     putTourToBackup(index, tour);
+    tour.EditedPlaceId = tour.place.objectId || null;
+    tour.EditedCountryId = tour.country.objectId || null;
+    tour.EditedHotelId = tour.hotel.objectId;
     tour.isModified = true;
   };
 
   $scope.update = function(tour) {
+    debugger;
+    tour.place = {
+        __type: 'Pointer',
+        className: 'places',
+        objectId: tour.EditedPlaceId
+      };
+    tour.country = {
+        __type: 'Pointer',
+        className: 'countries',
+        objectId: tour.EditedCountryId
+      }
+    tour.hotel = {
+      __type: 'Pointer',
+        className: 'hotels',
+        objectId: tour.EditedHotelId
+    }
     Tour.update({objectId: tour.objectId}, tour);
     tour.isModified = null;
   };
