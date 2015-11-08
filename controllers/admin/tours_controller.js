@@ -2,7 +2,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   $scope.pageName = 'Admin Tours';
   
   var Tour = $resource(
-    'https://api.parse.com/1/classes/tours/:objectId',
+    'https://api.parse.com/1/classes/tours/:objectId?include=country,hotel,place',
     {objectId: '@objectId'},
     {
       query: {isArray: true, transformResponse: parseServerResults},
@@ -13,13 +13,17 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   var Country = $resource(
     'https://api.parse.com/1/classes/countries/:objectId',
     {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults}
-    }
+    {query: {isArray: true, transformResponse: parseServerResults}}
   );
 
-   var Place = $resource(
+  var Place = $resource(
     'https://api.parse.com/1/classes/places/:objectId',
+    {objectId: '@objectId'},
+    {query: {isArray: true, transformResponse: parseServerResults}}
+  )
+
+  var Hotel = $resource(
+    'https://api.parse.com/1/classes/hotels/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
   )
@@ -27,6 +31,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   $scope.tours = Tour.query();
   $scope.countries = Country.query();
   $scope.places = Place.query();
+  $scope.hotels = Hotel.query();
 
   $scope.filter = {};
   $scope.backupToursCollection = [];
@@ -34,31 +39,68 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   // CRUD actions
   $scope.new = function() {
     $scope.newTour  = emptyTour();
+    $scope.newHotel = emptyHotel();
     $scope.showForm = true;
   };
 
   $scope.create = function() {
-    $scope.newTour.slug = $scope.newTour.country;
+    var hotelToServer = new Hotel($scope.newHotel)
     var tourToServer = new Tour($scope.newTour);
 
-    tourToServer.$save().then(
-      function(tour) {
-        var tourFromServer = angular.extend(tour, $scope.newTour);
-        $scope.tours.push(tourFromServer);
-        $scope.newTour = emptyTour();
-        $scope.showForm = false;
-      }
+    hotelToServer.$save().then(
+      function(hotel) {
+        var hotelFromServer = angular.extend(hotel, $scope.newHotel);
+        $scope.hotels.push(hotelFromServer);
+        tourToServer.hotel.objectId = hotelFromServer.objectId;
+
+        tourToServer.$save().then(
+          function(tour) {
+            loadNewTour(tour);
+            $scope.tours.push(tour);
+            $scope.newTour = emptyTour();
+            $scope.newHotel = emptyHotel();
+            $scope.showForm = false;
+          },
+
+          function(tourSavingError) { alert(tourSavingError); }
+        );
+      },
+
+      function(hotelSavingError) { alert(hotelSavingError); }
     );
   };
 
   $scope.edit = function(index, tour) {
     putTourToBackup(index, tour);
+    tour.newPlaceId = tour.place.objectId;
+    tour.newCountryId = tour.country.objectId;
+    tour.newHotelId = tour.hotel.objectId;
     tour.isModified = true;
   };
 
   $scope.update = function(tour) {
-    Tour.update({objectId: tour.objectId}, tour);
-    tour.isModified = null;
+    var tourToServer = angular.copy(tour)
+    tourToServer.place = {
+        __type: 'Pointer',
+        className: 'places',
+        objectId: tour.newPlaceId
+      };
+    tourToServer.country = {
+        __type: 'Pointer',
+        className: 'countries',
+        objectId: tour.newCountryId
+      };
+    tourToServer.hotel = {
+      __type: 'Pointer',
+        className: 'hotels',
+        objectId: tour.newHotelId
+      };
+
+    removeHelpAttributes(tourToServer);
+    removeHelpAttributes(tour);
+    
+    Tour.update({objectId: tourToServer.objectId}, tourToServer);
+    loadNewTour(tour);
   };
 
   $scope.destroy = function(index, tour) {
@@ -69,7 +111,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   // Form Helpers
   $scope.cancelEdit = function(index, tour) {
     getTourFromBackup(index, tour);
-    tour.isModified = null;
+    
   };
 
   $scope.cancelNewTour = function() {
@@ -83,18 +125,50 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
     return data.results;
   };
 
+  function loadNewTour(tour) {
+    Tour.get({objectId: tour.objectId}, function(tourFromServer) {
+      angular.extend(tour, tourFromServer);
+    });
+    return tour;
+  }
+
   function emptyTour() {
     return {
       title: null,
-      country: null,
-      place: null,
       description: null,
       price: null,
       duration:null,
-      slug: null,
-      isModified: null
+      place:{
+        __type: 'Pointer',
+        className: 'places',
+        objectId: null
+      },
+      country: {
+        __type: 'Pointer',
+        className: 'countries',
+        objectId: null
+      },
+      hotel: {
+        __type: 'Pointer',
+        className: 'hotels',
+        objectId: null
+      }
     }
   };
+
+  function emptyHotel() {
+    return {
+      title: null,
+      stars: null  
+    }
+  };
+
+  function removeHelpAttributes(tour) {
+    delete tour.newPlaceId;
+    delete tour.newCountryId;
+    delete tour.newHotelId;
+    delete tour.isModified;
+  }
 
   function putTourToBackup(index, tour) {
     var backupItem = angular.copy(tour);
