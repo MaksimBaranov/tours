@@ -55,8 +55,8 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
 
         tourToServer.$save().then(
           function(tour) {
-            var tourFromServer = angular.extend(tour, $scope.newTour);
-            $scope.tours.push(tourFromServer);
+            loadNewTour(tour);
+            $scope.tours.push(tour);
             $scope.newTour = emptyTour();
             $scope.newHotel = emptyHotel();
             $scope.showForm = false;
@@ -72,31 +72,35 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
 
   $scope.edit = function(index, tour) {
     putTourToBackup(index, tour);
-    tour.EditedPlaceId = tour.place.objectId || null;
-    tour.EditedCountryId = tour.country.objectId || null;
-    tour.EditedHotelId = tour.hotel.objectId;
+    tour.newPlaceId = tour.place.objectId;
+    tour.newCountryId = tour.country.objectId;
+    tour.newHotelId = tour.hotel.objectId;
     tour.isModified = true;
   };
 
   $scope.update = function(tour) {
-    debugger;
-    tour.place = {
+    var tourToServer = angular.copy(tour)
+    tourToServer.place = {
         __type: 'Pointer',
         className: 'places',
-        objectId: tour.EditedPlaceId
+        objectId: tour.newPlaceId
       };
-    tour.country = {
+    tourToServer.country = {
         __type: 'Pointer',
         className: 'countries',
-        objectId: tour.EditedCountryId
-      }
-    tour.hotel = {
+        objectId: tour.newCountryId
+      };
+    tourToServer.hotel = {
       __type: 'Pointer',
         className: 'hotels',
-        objectId: tour.EditedHotelId
-    }
-    Tour.update({objectId: tour.objectId}, tour);
-    tour.isModified = null;
+        objectId: tour.newHotelId
+      };
+
+    removeHelpAttributes(tourToServer);
+    removeHelpAttributes(tour);
+    
+    Tour.update({objectId: tourToServer.objectId}, tourToServer);
+    loadNewTour(tour);
   };
 
   $scope.destroy = function(index, tour) {
@@ -107,7 +111,7 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   // Form Helpers
   $scope.cancelEdit = function(index, tour) {
     getTourFromBackup(index, tour);
-    tour.isModified = null;
+    
   };
 
   $scope.cancelNewTour = function() {
@@ -121,13 +125,19 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
     return data.results;
   };
 
+  function loadNewTour(tour) {
+    Tour.get({objectId: tour.objectId}, function(tourFromServer) {
+      angular.extend(tour, tourFromServer);
+    });
+    return tour;
+  }
+
   function emptyTour() {
     return {
       title: null,
       description: null,
       price: null,
       duration:null,
-      isModified: null,
       place:{
         __type: 'Pointer',
         className: 'places',
@@ -152,6 +162,13 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
       stars: null  
     }
   };
+
+  function removeHelpAttributes(tour) {
+    delete tour.newPlaceId;
+    delete tour.newCountryId;
+    delete tour.newHotelId;
+    delete tour.isModified;
+  }
 
   function putTourToBackup(index, tour) {
     var backupItem = angular.copy(tour);

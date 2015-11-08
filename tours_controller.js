@@ -8,7 +8,7 @@ angular.module('tours').controller('ToursController', function($scope, $resource
   }
 
   var Tour = $resource(
-    'https://api.parse.com/1/classes/tours/:objectId',
+    'https://api.parse.com/1/classes/tours/:objectId?include=country,hotel,place',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
   )
