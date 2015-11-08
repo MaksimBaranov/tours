@@ -6,5 +6,4 @@ angular.module('tours').controller('TourController', function($scope, $routePara
   )
 
   $scope.tour = Tour.get({objectId: $routeParams.id})
-  debugger;
 });
