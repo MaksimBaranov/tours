@@ -44,8 +44,9 @@ angular.module('tours').controller('AdminCountriesController', function($scope, 
   };
 
   $scope.destroy = function(index, country) {
-    Country.delete({objectId: country.objectId});
-    $scope.countries.splice(index, 1);
+    Country.delete({objectId: country.objectId}, function() {
+      $scope.countries.splice(index, 1);  
+    });
   };
 
   // Form Helpers

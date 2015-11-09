@@ -13,6 +13,10 @@ angular.module('tours',  ['ngRoute', 'ngResource'])
     templateUrl: '/views/admin/places/index.html',
     controller: 'AdminPlacesController'
   })
+  .when('/admin/hotels', {
+    templateUrl: '/views/admin/hotels/index.html',
+    controller: 'AdminHotelsController'
+  })
   .when('/',{
     templateUrl: "/views/tours/index.html",
     controller: 'ToursController'

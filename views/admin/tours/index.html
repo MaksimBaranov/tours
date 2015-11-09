@@ -1,50 +1,59 @@
 <h1>{{ pageName }}</h1>
-  <select ng-model="filter.country">
-    <option></option>
-    <option ng-repeat="country in countries" value="{{ country.name }}">{{ country.name }}</option>
-  </select>
-  <select ng-model="filter.place">
-    <option></option>
-    <option ng-repeat="place in places" value="{{ place.name }}">{{ place.name }}</option>
-  </select>
-  <a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Tour</a>
+<select ng-model="filter.country">
+  <option></option>
+  <option ng-repeat="country in countries" value="{{ country.objectId }}">{{ country.name }}</option>
+</select>
+<select ng-model="filter.place">
+  <option></option>
+  <option ng-repeat="place in places | filter:filter.country" value="{{ place.objectId }}">{{ place.name }}</option>
+</select>
+<a ng-href="#" ng-click="new()" class="btn btn-primary pull-right">Create New Tour</a>
 <hr>
 <div class="row-fluid content-block">
   <form ng-Show="showForm">
     <div class="form-group col-md-4 col-md-offset-4">
       <label for="title">Title:</label><br />
       <input name="title" id="title" class="form-control" ng-model="newTour.title"><br />
+
+      <label for="hotel_title">Hotel Name:</label><br />
+      <input name="hotel_title" id="hotel_title" class="form-control" ng-model="newHotel.title"><br />
+
+      <label for="hotel_stars">Stars:</label><br />
+      <input name="hotel_stars" id="hotel_stars" type="number" class="form-control" ng-model="newHotel.stars"><br />
+
       <label for="country">Country:</label><br />
+      <select ng-model="newTour.country.objectId" ng-options="country.objectId as country.name for country in countries track by country.objectId" class="form-control"></select><br />
 
-      <select ng-model="newTour.country" ng-options="country.name as country.name for country in countries track by country.name" class="form-control"></select>
-      <br />
       <label for="place">Place:</label><br />
-
-      <select ng-model="newTour.place" ng-options="place.name as place.name for place in places track by place.name" class="form-control"></select>
-      <br />
+      <select ng-model="newTour.place.objectId" ng-options="place.objectId as place.name for place in places track by place.objectId" class="form-control"></select><br />
 
       <label for="text">Text:</label><br />
       <textarea name="text" id="text" class="form-control" ng-model="newTour.description"></textarea><br />
+
       <label for="price">Price:</label><br />
       <input name="price" id="price" type="number" class="form-control" ng-model="newTour.price"><br />
+
       <label for="duration">Duration:</label><br />
       <input name="duration" id="duration" type="number" class="form-control" ng-model="newTour.duration"><br />
+
       <button ng-click="create()" class="btn btn-primary">Save</button>
       <button ng-click="cancelNewTour()" class="btn btn-warning">Cancel</button>
     </div>
   </form>
   <div class="tours-list-block col-md-12">
-    <div ng-repeat="tour in tours | filter:{'country': filter.country, 'place': filter.place} track by $index" class="tour-block media">
-      <a class = "pull-left" href = "#">
+    <div ng-repeat="tour in tours | filter: { country: { objectId: filter.country }, place: { objectId: filter.place } } track by $index" class="tour-block media">
+      <a class = "pull-left" href = "/tour/{{tour.objectId}}">
         <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
       </a>
 
       <div ng-show="tour.isModified != true" class="tour-content-block media-body">
           <h4 class="media-heading tour-title">
-            <a ng-href="/tour/{{tour.slug}}">{{tour.title}}</a>
+            <a ng-href="/tour/{{tour.objectId}}">{{tour.title}}</a>
           </h4>
-          <div class="tour-country">{{tour.country}}</div>
-          <div class="tour-place">{{tour.place}}</div>
+          <div class="tour-country">{{tour.country.name}}</div>
+          <div class="tour-place">{{tour.hotel.title}}</div>
+          <div class="tour-place">{{tour.hotel.stars}}</div>
+          <div class="tour-place">{{tour.place.name}}</div>
           <div class="tour-price">{{tour.price}}</div>
           <div class="tour-duration">{{tour.duration}}</div>
           <div class="tour-text">{{tour.description}}</div>
@@ -53,11 +62,26 @@
       </div>
       <div ng-show="tour.isModified==true" class="media-body">
         <input ng-model="tour.title" class="form-control">
-        <input ng-model="tour.country" class="form-control">
-        <input ng-model="tour.place" class="form-control">
+
+        <select ng-model="tour.newCountryId"  class="form-control">
+          <option ng-repeat="country in countries track by country.objectId" value="{{country.objectId}}" ng-selected="country.objectId == tour.country.objectId"
+            >{{country.name}}</option>
+        </select><br />
+
+        <select ng-model="tour.newPlaceId" class="form-control">
+          <option ng-repeat="place in places track by place.objectId" value="{{place.objectId}}" ng-selected="place.objectId == tour.place.objectId">{{place.name}}</option>
+        </select><br />
+
+        <select ng-model="tour.newHotelId" class="form-control">
+          <option ng-repeat="hotel in hotels track by hotel.objectId" value="{{hotel.objectId}}" ng-selected="hotel.objectId == tour.hotel.objectId">{{hotel.title}}</option>
+        </select><br />
+
         <input ng-model="tour.price" type="number" class="form-control">
+
         <input ng-model="tour.duration" type="number" class="form-control">
+
         <textarea ng-model="tour.description" class="form-control"></textarea><br />
+
         <button ng-click="update(tour)" class="btn btn-success">Save</button>
         <button ng-click="cancelEdit($index, tour)" class="btn btn-warning">Cancel</button>
       </div>
