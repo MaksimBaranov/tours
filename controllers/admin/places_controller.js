@@ -44,8 +44,9 @@ angular.module('tours').controller('AdminPlacesController', function($scope, $lo
   };
 
   $scope.destroy = function(index, place) {
-    Place.delete({objectId: place.objectId});
-    $scope.places.splice(index, 1);
+    Place.delete({objectId: place.objectId}, function() {
+      $scope.places.splice(index, 1);  
+    });
   };
 
   // Form Helpers

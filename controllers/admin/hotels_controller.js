@@ -44,8 +44,9 @@ angular.module('tours').controller('AdminHotelsController', function($scope, $lo
   };
 
   $scope.destroy = function(index, hotel) {
-    Hotel.delete({objectId: hotel.objectId});
-    $scope.hotels.splice(index, 1);
+    Hotel.delete({objectId: hotel.objectId}, function() {
+      $scope.hotels.splice(index, 1);  
+    });
   };
 
   // Form Helpers

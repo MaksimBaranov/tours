@@ -47,27 +47,29 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
     var hotelToServer = new Hotel($scope.newHotel)
     var tourToServer = new Tour($scope.newTour);
 
+
     hotelToServer.$save().then(
       function(hotel) {
         var hotelFromServer = angular.extend(hotel, $scope.newHotel);
         $scope.hotels.push(hotelFromServer);
         tourToServer.hotel.objectId = hotelFromServer.objectId;
-
+        
         tourToServer.$save().then(
           function(tour) {
+            throw 'Unknown error';
             loadNewTour(tour);
             $scope.tours.push(tour);
             $scope.newTour = emptyTour();
             $scope.newHotel = emptyHotel();
             $scope.showForm = false;
-          },
-
-          function(tourSavingError) { alert(tourSavingError); }
-        );
-      },
-
-      function(hotelSavingError) { alert(hotelSavingError); }
-    );
+          }         
+        ).catch(function(SaveTourErr) {
+          alert(SaveTourErr);  
+        })
+      }
+    ).catch(function(SaveHotelErr) {
+      alert(SaveHotelErr);  
+    })
   };
 
   $scope.edit = function(index, tour) {
@@ -104,8 +106,9 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
   };
 
   $scope.destroy = function(index, tour) {
-    Tour.delete({objectId: tour.objectId});
-    $scope.tours.splice(index, 1);
+    Tour.delete({objectId: tour.objectId}, function() {
+      $scope.tours.splice(index, 1);  
+    });
   };
 
   // Form Helpers
