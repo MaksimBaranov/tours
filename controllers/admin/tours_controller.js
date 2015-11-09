@@ -56,7 +56,6 @@ angular.module('tours').controller('AdminToursController', function($scope, $loc
         
         tourToServer.$save().then(
           function(tour) {
-            throw 'Unknown error';
             loadNewTour(tour);
             $scope.tours.push(tour);
             $scope.newTour = emptyTour();
