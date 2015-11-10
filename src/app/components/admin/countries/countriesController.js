@@ -1,4 +1,4 @@
-angular.module('tours').controller('AdminCountriesController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminCountriesController', function($scope, $location, $resource){
   $scope.pageName = 'Admin Countries';
 
   var Country = $resource(

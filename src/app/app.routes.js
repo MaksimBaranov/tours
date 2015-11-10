@@ -1,31 +1,31 @@
-angular.module('tours',  ['ngRoute', 'ngResource'])
+angular.module('toursModule')
 .config(function($routeProvider, $locationProvider, $httpProvider) {
   $routeProvider
   .when('/admin/tours', {
-    templateUrl: "/views/admin/tours/index.html",
+    templateUrl: "app/components/admin/tours/toursView.html",
     controller: 'AdminToursController'
   })
   .when('/admin/countries', {
-    templateUrl: '/views/admin/countries/index.html',
+    templateUrl: 'app/components/admin/countries/countriesView.html',
     controller: 'AdminCountriesController'
   })
   .when('/admin/places', {
-    templateUrl: '/views/admin/places/index.html',
+    templateUrl: 'app/components/admin/places/placesView.html',
     controller: 'AdminPlacesController'
   })
   .when('/admin/hotels', {
-    templateUrl: '/views/admin/hotels/index.html',
+    templateUrl: 'app/components/admin/hotels/hotelsView.html',
     controller: 'AdminHotelsController'
   })
   .when('/',{
-    templateUrl: "/views/tours/index.html",
+    templateUrl: "app/components/tours/toursView.html",
     controller: 'ToursController'
   })
   .when('/tour/:id', {
-    templateUrl: "/views/tours/show.html",
+    templateUrl: "app/components/tour/tourView.html",
     controller: "TourController"
   }).otherwise({
-    templateUrl: '/404.html'
+    templateUrl: 'app/shared/404/404View.html'
   })
 
   $locationProvider.html5Mode(true);
@@ -35,7 +35,3 @@ angular.module('tours',  ['ngRoute', 'ngResource'])
     "X-Parse-REST-API-Key": "ggk5tVA6hSyGQ2Fpi628lpmx3irmuESExdgzezLe"
   };
 });
-
-
-
-

@@ -1,4 +1,4 @@
-angular.module('tours').controller('TourController', function($scope, $routeParams, $resource){
+angular.module('toursModule').controller('TourController', function($scope, $routeParams, $resource){
 
   var Tour = $resource(
  	'https://api.parse.com/1/classes/tours/:objectId?include=hotel',

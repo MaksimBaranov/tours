@@ -1,4 +1,4 @@
-angular.module('tours').controller('ToursController', function($scope, $resource){
+angular.module('toursModule').controller('ToursController', function($scope, $resource){
   $scope.pageName = 'Tours';
   $scope.filter = {};
 

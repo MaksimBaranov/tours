@@ -1,4 +1,4 @@
-angular.module('tours').controller('AdminPlacesController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminPlacesController', function($scope, $location, $resource){
   $scope.pageName = 'Admin Places';
 
   var Place = $resource(
