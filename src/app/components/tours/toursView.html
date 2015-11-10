@@ -13,7 +13,7 @@
   <div class="tours-list-block">
     <div ng-repeat="tour in tours | filter: { country: { objectId: filter.country }, place: { objectId: filter.place } } track by $index" class="tour-block media">
       <a class = "pull-left" ng-href = "/tour/{{tour.objectId}}">
-        <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
+        <img class = "media-object" ng-src = "/assets/img/foto_not_found.jpeg" alt = "Media Object">
       </a>
       <div class="tour-content-block media-body">
       <div class="tour-saved-info">

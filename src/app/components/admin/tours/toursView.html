@@ -43,7 +43,7 @@
   <div class="tours-list-block col-md-12">
     <div ng-repeat="tour in tours | filter: { country: { objectId: filter.country }, place: { objectId: filter.place } } track by $index" class="tour-block media">
       <a class = "pull-left" href = "/tour/{{tour.objectId}}">
-        <img class = "media-object" ng-src = "/public/images/foto_not_found.jpeg" alt = "Media Object">
+        <img class = "media-object" ng-src = "/assets/img/foto_not_found.jpeg" alt = "Media Object">
       </a>
 
       <div ng-show="tour.isModified != true" class="tour-content-block media-body">
