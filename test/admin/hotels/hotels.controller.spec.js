@@ -2,14 +2,13 @@ describe('AdminHotelsController', function() {
   
   beforeEach(module('toursModule'));
   var $scope = {};
-  var HotelAPIUrl = 'https://api.parse.com/1/classes/hotels';
+  var hotelAPIUrl = 'https://api.parse.com/1/classes/hotels';
   
   var $httpBackend = null;
 
   beforeEach(inject(function($controller, _$httpBackend_) {
   	$controller('AdminHotelsController', {$scope: $scope});
   	$httpBackend = _$httpBackend_;
-  	// $httpBackend.whenGET(TourAPIUrl).respond(200);
   }));
 
   describe('initialize controller', function() {
@@ -18,15 +17,37 @@ describe('AdminHotelsController', function() {
   	});
 
   	it('expect call to parse.com', function() {
-  		$httpBackend.expectGET(HotelAPIUrl).respond(200);
+  		$httpBackend.expectGET(hotelAPIUrl).respond(200);
   		expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
   	});
 
     it('sets $scope.hotels an array of hotels', function() {
-      var 
-      jsonResponse = JSON.stringify({resuls: [hotels]})
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse) 
+      var stubHotel = {title: 'Test Hotel', stars: 5};
+      jsonResponse = JSON.stringify({results: [stubHotel]});
+      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
+      $httpBackend.flush();
+
+      expect($scope.hotels.length).toBe(1);
+      var localHotel = $scope.hotels[0];
+      expect(localHotel.title).toBe(stubHotel.title);
     });
   });
 
+
+  // desribe('$scope.new', function() {
+
+  // });
+
+  describe('$scope.create', function() {
+    it('expect POST request to parse.com create point', function(){
+      // waiting for request to server
+      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
+      $scope.create();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
+    });
+
+    // it('', function(){
+
+    // });
+  });
 });
