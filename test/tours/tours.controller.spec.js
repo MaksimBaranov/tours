@@ -7,7 +7,6 @@ describe('ToursController', function() {
   }));
 
   it('sets pageName to Tours', function() {
-  	//check $scope.pageName == 'Tours'
   	expect($scope.pageName).toBe('Tours');
   });
   

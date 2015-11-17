@@ -39,14 +39,12 @@ angular.module('toursModule').controller('AdminHotelsController', function($scop
   };
 
   $scope.update = function(hotel) {
-    Hotel.update(hotel);
+    Hotel.update({objectId: hotel.objectId}, hotel);
     hotel.isModified = null;
   };
 
   $scope.destroy = function(index, hotel) {
-    debugger;
     Hotel.delete({objectId: hotel.objectId}, function() {
-      debugger;
       $scope.hotels.splice(index, 1);  
     });
   };
