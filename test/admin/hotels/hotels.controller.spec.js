@@ -4,10 +4,14 @@ describe('AdminHotelsController', function() {
   var $scope = {};
   var hotelAPIUrl = 'https://api.parse.com/1/classes/hotels';
   var $httpBackend = null;
+  var stubHotel = null;
+  var jsonResponse = null;
 
   beforeEach(inject(function($controller, _$httpBackend_) {
   	$controller('AdminHotelsController', {$scope: $scope});
   	$httpBackend = _$httpBackend_;
+    stubHotel = {title: 'Test Hotel', stars: 5, objectId: 1};
+    jsonResponse = JSON.stringify({results: [stubHotel]});
   }));
 
   describe('initialize controller', function() {
@@ -21,15 +25,12 @@ describe('AdminHotelsController', function() {
   	});
 
     it('sets $scope.hotels an array of hotels', function() {
-      var stubHotel = {title: 'Test Hotel', stars: 5};
-      jsonResponse = JSON.stringify({results: [stubHotel]});
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
 
       expect($scope.hotels.length).toBe(1);
-      var localHotel = $scope.hotels[0];
-      expect(localHotel.title).toBe(stubHotel.title);
-      expect(localHotel.stars).toBe(stubHotel.stars);
+      expect($scope.hotels[0].title).toBe(stubHotel.title);
+      expect($scope.hotels[0].stars).toBe(stubHotel.stars);
     });
   });
 
@@ -47,9 +48,12 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.create', function() {
-    it('expects POST request to parse.com create point', function(){
+    beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond('[]');
       $httpBackend.whenPOST(hotelAPIUrl).respond(201);
+    });
+
+    it('expects POST request to parse.com create point', function(){
       $scope.create();
       $httpBackend.flush();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
@@ -57,8 +61,6 @@ describe('AdminHotelsController', function() {
     });
 
     it('expects "push" function is called', function() {
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, '[]');
-      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
       spyOn($scope.hotels, 'push')
       $scope.create();
       $httpBackend.flush();
@@ -68,8 +70,6 @@ describe('AdminHotelsController', function() {
     });
 
     it('adds new hotel object to $scope.hotels', function() {
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, '[]');
-      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
       $scope.create();
       $httpBackend.flush();
       expect($scope.hotels.length).toBeGreaterThan(0);
@@ -79,14 +79,13 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.destroy', function() {
-    it('expects DELETE request to parse.com', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-
+    beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
-      $httpBackend.expectDELETE(hotelAPIUrl + '/' + localHotel.objectId).respond(200);
-      
+      $httpBackend.expectDELETE(hotelAPIUrl + '/' + stubHotel.objectId).respond(200);
+    });
+
+    it('expects DELETE request to parse.com', function() {
       $scope.destroy(0, $scope.hotels[0])
       $httpBackend.flush();
       
@@ -94,16 +93,9 @@ describe('AdminHotelsController', function() {
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
-    it('expects "splice" function is called', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      
+    it('expects \'splice\' function is called', function() {
       spyOn($scope.hotels, 'splice')
 
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-      $httpBackend.whenDELETE(hotelAPIUrl + '/' + localHotel.objectId).respond(200);
-      
       $scope.destroy(0, $scope.hotels[0])
       $httpBackend.flush();
       expect($scope.hotels.splice).toHaveBeenCalled();
@@ -112,13 +104,6 @@ describe('AdminHotelsController', function() {
     });
 
     it('expects one hotel is removed from $scope.hotels', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-      $httpBackend.whenDELETE(hotelAPIUrl + '/' + localHotel.objectId).respond(200);
-      
       $scope.destroy(0, $scope.hotels[0])
       $httpBackend.flush();
       
@@ -129,24 +114,18 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.edit', function() {
-    it('puts hotel to backup storage', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
+    beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
+    });
 
+    it('puts hotel to backup storage', function() {
       expect($scope.backupHotelsCollection.length).toBe(0);
-      
       $scope.edit(0, $scope.hotels[0])
       expect($scope.backupHotelsCollection.length).toBeGreaterThan(0);
     });
 
     it('sets hotel.isModified attribute to true value', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-
       $scope.edit(0, $scope.hotels[0])
       expect($scope.hotels[0].isModified).toBeDefined();
       expect($scope.hotels[0].isModified).toBeTruthy();
@@ -154,13 +133,13 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.update', function(){
-    it('expects PUT request to parse.com update point', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
+    beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
+      $httpBackend.expectPUT(hotelAPIUrl + '/' + stubHotel.objectId).respond(200);      
+    });
 
-      $httpBackend.expectPUT(hotelAPIUrl + '/' + localHotel.objectId).respond(200);
+    it('expects PUT request to parse.com update point', function() {
       $scope.update($scope.hotels[0]);
       $httpBackend.flush();
 
@@ -169,15 +148,9 @@ describe('AdminHotelsController', function() {
     });
 
     it('expects hotel attributes are changed after PUT request', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-
       $scope.hotels[0].title = 'NewTitle';
       $scope.hotels[0].stars = 5;
       
-      $httpBackend.expectPUT(hotelAPIUrl + '/' + localHotel.objectId).respond(200);
       $scope.update($scope.hotels[0]);
       $httpBackend.flush();
 
@@ -190,30 +163,23 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.cancelEdit', function() {
-    it('expects restore hotel attributes values', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
+    beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
-
       $scope.edit(0, $scope.hotels[0])
+    });
 
+    it('expects restore hotel attributes values', function() {
       $scope.hotels[0].title = 'NewTitle';
       $scope.hotels[0].stars = 5;
       
       $scope.cancelEdit(0, $scope.hotels[0])
 
-      expect($scope.hotels[0].title).toBe(localHotel.title)
-      expect($scope.hotels[0].stars).toBe(localHotel.stars)
+      expect($scope.hotels[0].title).toBe(stubHotel.title)
+      expect($scope.hotels[0].stars).toBe(stubHotel.stars)
     });
 
     it('sets hotel.isModified value to null', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-
-      $scope.edit(0, $scope.hotels[0])
       $scope.cancelEdit(0, $scope.hotels[0])
 
       expect($scope.hotels[0].isModified).toBeNull()
@@ -221,32 +187,17 @@ describe('AdminHotelsController', function() {
   });
 
   describe('$scope.cancelNewHotel', function() {
-    it('expects $scope.showForm value is true', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
+    it('expects $scope.showForm value is true and attributes are null', function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
       
       $scope.new();
       $scope.newHotel = 'NewTitle';
-      $scope.stars = 5;
+      $scope.stars = 4;
 
       $scope.cancelNewHotel();
 
       expect($scope.showForm).toBeFalsy();
-    });
-
-    it('expects $scope.showForm value is true', function() {
-      var localHotel = {title: 'oldTitle', stars: 1, objectId: 1};
-      jsonResponse = JSON.stringify({results: [localHotel]});
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-      
-      $scope.new();
-      $scope.newHotel = 'NewTitle';
-      $scope.stars = 5;
-
-      $scope.cancelNewHotel();
       expect($scope.newHotel.title).toBeNull();
       expect($scope.newHotel.stars).toBeNull();
     });
