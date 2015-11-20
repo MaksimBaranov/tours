@@ -20,13 +20,13 @@ angular.module('toursModule').controller('AdminToursController', function($scope
     'https://api.parse.com/1/classes/places/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
-  )
+  );
 
   var Hotel = $resource(
     'https://api.parse.com/1/classes/hotels/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
-  )
+  );
 
   $scope.tours = Tour.query();
   $scope.countries = Country.query();
@@ -56,7 +56,7 @@ angular.module('toursModule').controller('AdminToursController', function($scope
         
         tourToServer.$save().then(
           function(tour) {
-            loadNewTour(tour);
+            // loadNewTour(tour);
             $scope.tours.push(tour);
             $scope.newTour = emptyTour();
             $scope.newHotel = emptyHotel();
