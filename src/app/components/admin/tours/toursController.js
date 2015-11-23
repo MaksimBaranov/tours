@@ -20,13 +20,13 @@ angular.module('toursModule').controller('AdminToursController', function($scope
     'https://api.parse.com/1/classes/places/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
-  )
+  );
 
   var Hotel = $resource(
     'https://api.parse.com/1/classes/hotels/:objectId',
     {objectId: '@objectId'},
     {query: {isArray: true, transformResponse: parseServerResults}}
-  )
+  );
 
   $scope.tours = Tour.query();
   $scope.countries = Country.query();
@@ -63,11 +63,11 @@ angular.module('toursModule').controller('AdminToursController', function($scope
             $scope.showForm = false;
           }         
         ).catch(function(SaveTourErr) {
-          alert(SaveTourErr);  
+          $scope.errorMessage = SaveTourErr;  
         })
       }
     ).catch(function(SaveHotelErr) {
-      alert(SaveHotelErr);  
+      $scope.errorMessage = SaveHotelErr;  
     })
   };
 

@@ -1,0 +1,11 @@
+Application configuration steps:
+
+Lesson - 05 Setup Karma and Jasmine for testing, setup package.json for install
+
+1) Prepare package.json file and run commands: 
+ 	- sudo npm install -g karma-cli
+ 	- npm install karma --save-dev
+ 	- npm install karma-jasmine --save-dev
+ 	- sudo npm install
+2) Run command: karma init. Last question please answer - no.
+3) Please see karma.conf.js file for working settings.
