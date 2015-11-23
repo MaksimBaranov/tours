@@ -24,7 +24,7 @@
           </h4>
           <div class="hotel-stars">{{hotel.stars}}</div>
           <button ng-click="edit($index, hotel)" class="btn btn-success">Edit Tour</button>
-          <button ng-click="destroy($index, hotel)" class="btn btn-danger">Delete Tour</button>
+          <button ng-click="destroy(0, hotel)" class="btn btn-danger">Delete Tour</button>
       </div>
       <div ng-show="hotel.isModified==true" class="media-body">
         <input ng-model="hotel.title" class="form-control"><br />
