@@ -63,11 +63,11 @@ angular.module('toursModule').controller('AdminToursController', function($scope
             $scope.showForm = false;
           }         
         ).catch(function(SaveTourErr) {
-          alert(SaveTourErr);  
+          $scope.errorMessage = SaveTourErr;  
         })
       }
     ).catch(function(SaveHotelErr) {
-      alert(SaveHotelErr);  
+      $scope.errorMessage = SaveHotelErr;  
     })
   };
 

@@ -19,11 +19,6 @@ describe('AdminHotelsController', function() {
   		expect($scope.pageName).toBe('Admin Hotels');
   	});
 
-  	it('expect call to parse.com', function() {
-  		$httpBackend.expectGET(hotelAPIUrl).respond(200);
-  		expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-  	});
-
     it('sets $scope.hotels an array of hotels', function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
@@ -50,14 +45,13 @@ describe('AdminHotelsController', function() {
   describe('$scope.create', function() {
     beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond('[]');
-      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
+      $httpBackend.expectPOST(hotelAPIUrl).respond(201);
     });
 
     it('expects POST request to parse.com create point', function(){
       $scope.create();
       $httpBackend.flush();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects "push" function is called', function() {
@@ -65,16 +59,14 @@ describe('AdminHotelsController', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.hotels.push).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('adds new hotel object to $scope.hotels', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.hotels.length).toBeGreaterThan(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
@@ -86,30 +78,25 @@ describe('AdminHotelsController', function() {
     });
 
     it('expects DELETE request to parse.com', function() {
-      $scope.destroy(0, $scope.hotels[0])
+      $scope.destroy(0, $scope.hotels[0]);
       $httpBackend.flush();
       
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('expects \'splice\' function is called', function() {
       spyOn($scope.hotels, 'splice')
 
-      $scope.destroy(0, $scope.hotels[0])
+      $scope.destroy(0, $scope.hotels[0]);
       $httpBackend.flush();
       expect($scope.hotels.splice).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('expects one hotel is removed from $scope.hotels', function() {
-      $scope.destroy(0, $scope.hotels[0])
+      $scope.destroy(0, $scope.hotels[0]);
       $httpBackend.flush();
       
       expect($scope.hotels.length).toBe(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
@@ -121,12 +108,12 @@ describe('AdminHotelsController', function() {
 
     it('puts hotel to backup storage', function() {
       expect($scope.backupHotelsCollection.length).toBe(0);
-      $scope.edit(0, $scope.hotels[0])
+      $scope.edit(0, $scope.hotels[0]);
       expect($scope.backupHotelsCollection.length).toBeGreaterThan(0);
     });
 
     it('sets hotel.isModified attribute to true value', function() {
-      $scope.edit(0, $scope.hotels[0])
+      $scope.edit(0, $scope.hotels[0]);
       expect($scope.hotels[0].isModified).toBeDefined();
       expect($scope.hotels[0].isModified).toBeTruthy();
     });
@@ -144,7 +131,6 @@ describe('AdminHotelsController', function() {
       $httpBackend.flush();
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects hotel attributes are changed after PUT request', function() {
@@ -158,7 +144,6 @@ describe('AdminHotelsController', function() {
       expect($scope.hotels[0].stars).toBe(5);
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
 
@@ -166,23 +151,23 @@ describe('AdminHotelsController', function() {
     beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
-      $scope.edit(0, $scope.hotels[0])
+      $scope.edit(0, $scope.hotels[0]);
     });
 
     it('expects restore hotel attributes values', function() {
       $scope.hotels[0].title = 'NewTitle';
       $scope.hotels[0].stars = 5;
       
-      $scope.cancelEdit(0, $scope.hotels[0])
+      $scope.cancelEdit(0, $scope.hotels[0]);
 
-      expect($scope.hotels[0].title).toBe(stubHotel.title)
-      expect($scope.hotels[0].stars).toBe(stubHotel.stars)
+      expect($scope.hotels[0].title).toBe(stubHotel.title);
+      expect($scope.hotels[0].stars).toBe(stubHotel.stars);
     });
 
     it('sets hotel.isModified value to null', function() {
-      $scope.cancelEdit(0, $scope.hotels[0])
+      $scope.cancelEdit(0, $scope.hotels[0]);
 
-      expect($scope.hotels[0].isModified).toBeNull()
+      expect($scope.hotels[0].isModified).toBeNull();
     });
   });
 

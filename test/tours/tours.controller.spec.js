@@ -18,24 +18,22 @@ describe('ToursController', function() {
   	stubPlace = {name: 'Test Place'};
   	stubTour = {title: 'Test tour', description: 'Test description', price: 2, objectId: 1,  country: stubCountry, hotel: stubHotel, place: stubPlace};
     tourJsonResponse = JSON.stringify({results: [stubTour]});
-	$httpBackend.whenGET(countryAPIUrl).respond(200, JSON.stringify({results: [stubCountry]}));
-	$httpBackend.whenGET(placeAPIUrl).respond(200, JSON.stringify({results: [stubPlace]}));
+	  
   }));
 
   it('sets pageName to Tours', function() {
   	expect($scope.pageName).toBe('Tours');
   });
 
-  it('expects call to parse.com', function() {
-	$httpBackend.expectGET(tourAPIUrl).respond(200);
-	expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-  });
-
   it('sets countries, places, tours arrays', function() {
   	$httpBackend.expectGET(tourAPIUrl).respond(200, tourJsonResponse);
-  	$httpBackend.flush();
-  	expect(angular.equals($scope.tours[0], stubTour)).toBeTruthy();
+  	$httpBackend.expectGET(countryAPIUrl).respond(200, JSON.stringify({results: [stubCountry]}));
+    $httpBackend.expectGET(placeAPIUrl).respond(200, JSON.stringify({results: [stubPlace]}));
+    $httpBackend.flush();
+  	
+    expect(angular.equals($scope.tours[0], stubTour)).toBeTruthy();
   	expect(angular.equals($scope.places[0], stubPlace)).toBeTruthy();
   	expect(angular.equals($scope.countries[0], stubCountry)).toBeTruthy();
+    expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
   });
 });

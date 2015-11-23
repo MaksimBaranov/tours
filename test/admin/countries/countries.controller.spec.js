@@ -36,7 +36,7 @@ describe('AdminCounriesController', function() {
 
     it('sets $scope.showForm be equal true value', function() {
       $scope.new();
-      expect($scope.showForm).toBe(true);
+      expect($scope.showForm).toBeTruthy();
     });
   });
 
@@ -50,7 +50,6 @@ describe('AdminCounriesController', function() {
       $scope.create();
       $httpBackend.flush();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects "push" function is called', function() {
@@ -59,7 +58,6 @@ describe('AdminCounriesController', function() {
       $httpBackend.flush();
       expect($scope.countries.push).toHaveBeenCalled();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('adds new country object to $scope.countries', function() {
@@ -67,7 +65,6 @@ describe('AdminCounriesController', function() {
       $httpBackend.flush();
       expect($scope.countries.length).toBeGreaterThan(0);
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
 
@@ -132,7 +129,6 @@ describe('AdminCounriesController', function() {
       $httpBackend.flush();
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects country attributes are changed after PUT request', function() {
@@ -142,9 +138,7 @@ describe('AdminCounriesController', function() {
       $httpBackend.flush();
 
       expect($scope.countries[0].name).toBe('NewName');
-
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
 
@@ -157,7 +151,6 @@ describe('AdminCounriesController', function() {
 
     it('expects restore countries attributes values', function() {
       $scope.countries[0].name = 'NewName';
-      
       $scope.cancelEdit(0, $scope.countries[0])
 
       expect($scope.countries[0].name).toBe(stubCountry.name)

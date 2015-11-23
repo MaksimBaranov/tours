@@ -19,9 +19,9 @@ describe('AdminToursController', function() {
   	stubPlace = {name: 'Test Place', objectId: 1};
   	stubTour = {title: 'Test tour', description: 'Test description', price: 2, objectId: 1,  country: stubCountry, hotel: stubHotel, place: stubPlace, duration: 20};
     tourJsonResponse = JSON.stringify({results: [stubTour]});
-	$httpBackend.whenGET(countryAPIUrl).respond(200, JSON.stringify({results: [stubCountry]}));
-	$httpBackend.whenGET(placeAPIUrl).respond(200, JSON.stringify({results: [stubPlace]}));
-	$httpBackend.whenGET(hotelAPIUrl).respond(200, JSON.stringify({results: [stubHotel]}));
+	  $httpBackend.whenGET(countryAPIUrl).respond(200, JSON.stringify({results: [stubCountry]}));
+	  $httpBackend.whenGET(placeAPIUrl).respond(200, JSON.stringify({results: [stubPlace]}));
+	  $httpBackend.whenGET(hotelAPIUrl).respond(200, JSON.stringify({results: [stubHotel]}));
   }));
 
   describe('initialize', function() {
@@ -29,14 +29,10 @@ describe('AdminToursController', function() {
 	  expect($scope.pageName).toBe('Admin Tours');
   	});
 
-  	it('expects call to parse.com', function() {
-	  $httpBackend.expectGET(tourAPIUrl).respond(200);
-	  expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-    });
-
     it('sets countries, places, tours arrays', function() {
-  	  $httpBackend.expectGET(tourAPIUrl).respond(200, tourJsonResponse);
+  	  $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
   	  $httpBackend.flush();
+
   	  expect(angular.equals($scope.tours[0], stubTour)).toBeTruthy();
   	  expect(angular.equals($scope.places[0], stubPlace)).toBeTruthy();
   	  expect(angular.equals($scope.countries[0], stubCountry)).toBeTruthy();
@@ -46,13 +42,13 @@ describe('AdminToursController', function() {
   describe('$scope.new', function() {
   	it('sets newTour attributes to be null', function() {
 	  $scope.new();
-	  expect($scope.newTour.title).toBeNull();
-	  expect($scope.newTour.description).toBeNull();
-	  expect($scope.newTour.price).toBeNull();
-	  expect($scope.newTour.duration).toBeNull();
-	  expect($scope.newTour.place.objectId).toBeNull();
-	  expect($scope.newTour.hotel.objectId).toBeNull();
-	  expect($scope.newTour.country.objectId).toBeNull();
+  	  expect($scope.newTour.title).toBeNull();
+  	  expect($scope.newTour.description).toBeNull();
+  	  expect($scope.newTour.price).toBeNull();
+  	  expect($scope.newTour.duration).toBeNull();
+  	  expect($scope.newTour.place.objectId).toBeNull();
+  	  expect($scope.newTour.hotel.objectId).toBeNull();
+  	  expect($scope.newTour.country.objectId).toBeNull();
   	});
 
   	it('sets showForm attribute to true value', function() {
@@ -65,36 +61,63 @@ describe('AdminToursController', function() {
     beforeEach(function() {
       $httpBackend.whenGET(hotelAPIUrl).respond(200, '[]');
       $httpBackend.whenGET(tourAPIUrl).respond(200, '[]');
-      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
-      $httpBackend.whenPOST(tourAPIUrl).respond(201, {"objectId":"1"});
-      $httpBackend.whenGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
     });
 
     it('expects 2 POST request to parse.com create point', function() {
-	  $scope.create();
-      $httpBackend.flush();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-    });
-
-    it('expects "push" function is called', function() {
-	  spyOn($scope.hotels, 'push')
-	  spyOn($scope.tours, 'push')
+      $httpBackend.expectPOST(hotelAPIUrl).respond(201);
+      $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);      
+	    
       $scope.create();
       $httpBackend.flush();
+
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
+    });
+
+    it('sets error about failed request if hotel creation trow exception', function() {
+      $httpBackend.whenPOST(hotelAPIUrl).respond(500);
+      $scope.create();
+      $httpBackend.flush();
+
+      expect($scope.errorMessage).toBeDefined();
+    });
+
+    it('sets error about failed request if tour creation trow exception', function() {
+      $httpBackend.whenPOST(hotelAPIUrl).respond(201);
+      $httpBackend.whenPOST(tourAPIUrl).respond(500);
+      $scope.create();
+      $httpBackend.flush();
+
+      expect($scope.errorMessage).toBeDefined();
+    });    
+
+    it('expects "push" function is called', function() {
+      $httpBackend.expectPOST(hotelAPIUrl).respond(201);
+      $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
+
+      spyOn($scope.hotels, 'push')
+	    spyOn($scope.tours, 'push')
+
+      $scope.create();
+      $httpBackend.flush();
+
       expect($scope.hotels.push).toHaveBeenCalled();
       expect($scope.tours.push).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();	
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('adds new hotel and tour to $scope', function() {
-	  $scope.create();
+      $httpBackend.expectPOST(hotelAPIUrl).respond(201);
+      $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
+
+	    $scope.create();
       $httpBackend.flush();
+
       expect($scope.hotels.length).toBeGreaterThan(0);
       expect($scope.tours.length).toBeGreaterThan(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
@@ -109,7 +132,6 @@ describe('AdminToursController', function() {
       $scope.destroy(0, $scope.tours[0])
       $httpBackend.flush();
       
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
@@ -118,9 +140,8 @@ describe('AdminToursController', function() {
 
       $scope.destroy(0, $scope.tours[0])
       $httpBackend.flush();
+
       expect($scope.tours.splice).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('expects one tour is removed from $scope.hotels', function() {
@@ -128,8 +149,6 @@ describe('AdminToursController', function() {
       $httpBackend.flush();
       
       expect($scope.tours.length).toBe(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     describe('$scope.edit', function() {
@@ -153,7 +172,7 @@ describe('AdminToursController', function() {
 
   describe('$scope.update', function(){
     beforeEach(function() {
-      $httpBackend.expectGET(tourAPIUrl).respond(200, tourJsonResponse);
+      $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
       $httpBackend.flush();
       $httpBackend.expectPUT('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200);      
       $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);	
@@ -167,7 +186,6 @@ describe('AdminToursController', function() {
       $httpBackend.flush();
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects tour attributes are changed after PUT request', function() {
@@ -192,7 +210,6 @@ describe('AdminToursController', function() {
       expect($scope.tours[0].isModified).toBeUndefined();
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
 

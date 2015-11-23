@@ -19,11 +19,6 @@ describe('AdminPlacesController', function() {
   		expect($scope.pageName).toBe('Admin Places');
   	});
 
-  	it('expect call to parse.com', function() {
-  		$httpBackend.expectGET(placeAPIUrl).respond(200);
-  		expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-  	});
-
     it('sets $scope.places an array of places', function() {
       $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
@@ -48,14 +43,13 @@ describe('AdminPlacesController', function() {
   describe('$scope.create', function() {
     beforeEach(function() {
       $httpBackend.whenGET(placeAPIUrl).respond('[]');
-      $httpBackend.whenPOST(placeAPIUrl).respond(201);
+      $httpBackend.expectPOST(placeAPIUrl).respond(201);
     });
 
     it('expects POST request to parse.com create point', function(){
       $scope.create();
       $httpBackend.flush();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects "push" function is called', function() {
@@ -63,16 +57,14 @@ describe('AdminPlacesController', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.places.push).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('adds new place object to $scope.places', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.places.length).toBeGreaterThan(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
@@ -87,7 +79,6 @@ describe('AdminPlacesController', function() {
       $scope.destroy(0, $scope.places[0])
       $httpBackend.flush();
       
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
@@ -97,8 +88,6 @@ describe('AdminPlacesController', function() {
       $scope.destroy(0, $scope.places[0])
       $httpBackend.flush();
       expect($scope.places.splice).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('expects one place is removed from $scope.places', function() {
@@ -106,8 +95,6 @@ describe('AdminPlacesController', function() {
       $httpBackend.flush();
       
       expect($scope.places.length).toBe(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
@@ -142,7 +129,6 @@ describe('AdminPlacesController', function() {
       $httpBackend.flush();
 
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
     it('expects place attributes are changed after PUT request', function() {
@@ -154,9 +140,7 @@ describe('AdminPlacesController', function() {
 
       expect($scope.places[0].name).toBe('NewName');
       expect($scope.places[0].stars).toBe(5);
-
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
 
