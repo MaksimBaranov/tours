@@ -19,11 +19,6 @@ describe('AdminCounriesController', function() {
       expect($scope.pageName).toBe('Admin Countries');
     });
 
-    it('expect call to parse.com', function() {
-      $httpBackend.expectGET(countryAPIUrl).respond(200);
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-    });
-
     it('sets $scope.countries an array of countries', function() {
       $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
       $httpBackend.flush();
@@ -48,7 +43,7 @@ describe('AdminCounriesController', function() {
   describe('$scope.create', function() {
     beforeEach(function() {
       $httpBackend.whenGET(countryAPIUrl).respond('[]');
-      $httpBackend.whenPOST(countryAPIUrl).respond(201);
+      $httpBackend.expectPOST(countryAPIUrl).respond(201);
     });
 
     it('expects POST request to parse.com create point', function(){
@@ -63,7 +58,7 @@ describe('AdminCounriesController', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.countries.push).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
       expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
 
@@ -71,7 +66,7 @@ describe('AdminCounriesController', function() {
       $scope.create();
       $httpBackend.flush();
       expect($scope.countries.length).toBeGreaterThan(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
       expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
     });
   });
@@ -87,7 +82,6 @@ describe('AdminCounriesController', function() {
       $scope.destroy(0, $scope.countries[0])
       $httpBackend.flush();
       
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
@@ -97,8 +91,6 @@ describe('AdminCounriesController', function() {
       $scope.destroy(0, $scope.countries[0])
       $httpBackend.flush();
       expect($scope.countries.splice).toHaveBeenCalled();
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
 
     it('expects one country is removed from $scope.countries', function() {
@@ -106,8 +98,6 @@ describe('AdminCounriesController', function() {
       $httpBackend.flush();
       
       expect($scope.countries.length).toBe(0);
-      expect($httpBackend.verifyNoOutstandingRequest).not.toThrow();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 

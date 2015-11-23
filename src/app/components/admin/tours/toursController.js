@@ -56,7 +56,7 @@ angular.module('toursModule').controller('AdminToursController', function($scope
         
         tourToServer.$save().then(
           function(tour) {
-            // loadNewTour(tour);
+            loadNewTour(tour);
             $scope.tours.push(tour);
             $scope.newTour = emptyTour();
             $scope.newHotel = emptyHotel();

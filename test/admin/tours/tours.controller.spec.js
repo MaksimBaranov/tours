@@ -63,11 +63,11 @@ describe('AdminToursController', function() {
 
   describe('$scope.create', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(hotelAPIUrl).respond('[]');
-      $httpBackend.whenGET(tourAPIUrl).respond('[]');
-      $httpBackend.whenGET('https://api.parse.com/1/classes/tours/:objectId?include=country,hotel,place', {objectId: stubTour}).respond(200, tourJsonResponse);
+      $httpBackend.whenGET(hotelAPIUrl).respond(200, '[]');
+      $httpBackend.whenGET(tourAPIUrl).respond(200, '[]');
       $httpBackend.whenPOST(hotelAPIUrl).respond(201);
-      $httpBackend.whenPOST(tourAPIUrl).respond(201);
+      $httpBackend.whenPOST(tourAPIUrl).respond(201, {"objectId":"1"});
+      $httpBackend.whenGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
     });
 
     it('expects 2 POST request to parse.com create point', function() {
