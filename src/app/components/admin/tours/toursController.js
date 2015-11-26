@@ -1,4 +1,4 @@
-angular.module('toursModule').controller('AdminToursController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminToursController', function($scope, $location, $resource, $http){
   $scope.pageName = 'Admin Tours';
   
   var Tour = $resource(
@@ -110,16 +110,31 @@ angular.module('toursModule').controller('AdminToursController', function($scope
     });
   };
 
+  $scope.uploadImage = function(file, tour) {
+    // $scope.processingUpload = true;
+    $http.post('https://api.parse.com/1/files/'+file.name, file, {
+      transformRequest: angular.identity
+    }).then(function(data) {
+      data = angular.fromJson(data);
+      tour.image = { __type: 'File', name: data.data.name, url: data.data.url }
+    // $scope.processingUpload = false;
+    });
+  }
+
   // Form Helpers
   $scope.cancelEdit = function(index, tour) {
     getTourFromBackup(index, tour);
-    
+    removeHelpAttributes(tour);
   };
 
   $scope.cancelNewTour = function() {
     $scope.showForm = false;
     $scope.newTour = emptyTour();
   };
+
+  $scope.imageTourRender = function(tour){
+    return tour.image != undefined ? tour.image.url : '/assets/img/foto_not_found.jpeg'
+  }
 
   // Actions' helpers
   function parseServerResults(data, headerGetter) {

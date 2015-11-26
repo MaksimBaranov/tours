@@ -43,7 +43,7 @@
   <div class="tours-list-block col-md-12">
     <div ng-repeat="tour in tours | filter: { country: { objectId: filter.country }, place: { objectId: filter.place } } track by $index" class="tour-block media">
       <a class = "pull-left" href = "/tour/{{tour.objectId}}">
-        <img class = "media-object" ng-src = "/assets/img/foto_not_found.jpeg" alt = "Media Object">
+        <img class = "media-object" ng-src = "{{ imageTourRender(tour) }}" alt = "Media Object">
       </a>
 
       <div ng-show="tour.isModified != true" class="tour-content-block media-body">
@@ -81,6 +81,8 @@
         <input ng-model="tour.duration" type="number" class="form-control">
 
         <textarea ng-model="tour.description" class="form-control"></textarea><br />
+
+        <input class="form-control" type="file" onchange="angular.element(this).scope().uploadImage(this.files[0], angular.element(this).scope().tour)"><br />
 
         <button ng-click="update(tour)" class="btn btn-success">Save</button>
         <button ng-click="cancelEdit($index, tour)" class="btn btn-warning">Cancel</button>
