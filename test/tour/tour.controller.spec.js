@@ -1,7 +1,7 @@
 describe('TourController', function() {
   beforeEach(module('toursModule'));
   var $scope = {};
-  var tourAPIUrl = 'https://api.parse.com/1/classes/tours/1?include=hotel';
+  var tourAPIUrl = 'https://api.parse.com/1/classes/tours/1?include=country,hotel,place';
   var $httpBackend = null;
   var stubTour = {title: "TestTour", objectId: 1}
 

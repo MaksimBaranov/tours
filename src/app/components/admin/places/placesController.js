@@ -1,14 +1,5 @@
-angular.module('toursModule').controller('AdminPlacesController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminPlacesController', function($scope, $resource, Place){
   $scope.pageName = 'Admin Places';
-
-  var Place = $resource(
-    'https://api.parse.com/1/classes/places/:objectId',
-    {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults},
-      update: {method: 'PUT'}
-    }
-  );
 
   $scope.places = Place.query();
 
@@ -61,11 +52,6 @@ angular.module('toursModule').controller('AdminPlacesController', function($scop
   };
 
   // Actions' helpers
-  function parseServerResults(data, headerGetter) {
-    data = angular.fromJson(data);
-    return data.results;
-  };
-
   function emptyPlace() {
     return {
       name: null,
