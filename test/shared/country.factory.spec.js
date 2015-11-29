@@ -18,16 +18,11 @@ describe('Country', function() {
       $httpBackend.expectGET(countryAPIUrl).respond(jsonResponse);
     });
 
-    it('requests to API', function(){
-      Country.query();
-      $httpBackend.flush();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-    });
-
-    it('get data from API', function(){
+    it('fetches data by request to API', function(){
       var response = Country.query();
       $httpBackend.flush();
       expect(angular.equals(response, countriesResponseData)).toBe(true);
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 

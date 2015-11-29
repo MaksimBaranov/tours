@@ -18,16 +18,11 @@ describe('Place', function() {
       $httpBackend.expectGET(hotelAPIUrl).respond(jsonResponse);
     });
 
-    it('requests to API', function(){
-      Hotel.query();
-      $httpBackend.flush();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-    });
-
-    it('get data from API', function(){
+    it('fetches data by request to API', function(){
       var response = Hotel.query();
       $httpBackend.flush();
       expect(angular.equals(response, hotelsResponseData)).toBe(true);
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 

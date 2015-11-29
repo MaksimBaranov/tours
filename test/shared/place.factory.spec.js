@@ -18,16 +18,11 @@ describe('Place', function() {
       $httpBackend.expectGET(placeAPIUrl).respond(jsonResponse);
     });
 
-    it('requests to API', function(){
-      Place.query();
-      $httpBackend.flush();
-      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
-    });
-
-    it('get data from API', function(){
+    it('fetches data by request to API', function(){
       var response = Place.query();
       $httpBackend.flush();
       expect(angular.equals(response, placesResponseData)).toBe(true);
+      expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
