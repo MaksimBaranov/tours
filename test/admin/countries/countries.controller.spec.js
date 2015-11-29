@@ -4,14 +4,20 @@ describe('AdminCounriesController', function() {
   var $scope = {};
   var countryAPIUrl = 'https://api.parse.com/1/classes/countries';
   var $httpBackend = null;
+  var Country = null;
   var stubCountry = null;
-  var jsonResponse = null;
+  var stubCountries = null;
 
-  beforeEach(inject(function($controller, _$httpBackend_) {
-    $controller('AdminCountriesController', {$scope: $scope});
+  beforeEach(inject(function($controller, _$httpBackend_, _Country_) {
+    Country = _Country_
     $httpBackend = _$httpBackend_;
+    
     stubCountry = {name: 'Belarus', objectId: 1};
-    jsonResponse = JSON.stringify({results: [stubCountry]});
+    stubCountries = [stubCountry]
+    
+    spyOn(Country, 'query').and.returnValue(stubCountries)
+
+    $controller('AdminCountriesController', {$scope: $scope, Country: Country});
   }));
 
   describe('initialize controller', function() {
@@ -20,11 +26,9 @@ describe('AdminCounriesController', function() {
     });
 
     it('sets $scope.countries an array of countries', function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-
       expect($scope.countries.length).toBe(1);
-      expect($scope.countries[0].name).toBe(stubCountry.name);
+      expect($scope.countries).toBe(stubCountries);
+      expect($scope.countries).toBe(stubCountries);
     });
   });
 
@@ -42,7 +46,6 @@ describe('AdminCounriesController', function() {
 
   describe('$scope.create', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(countryAPIUrl).respond('[]');
       $httpBackend.expectPOST(countryAPIUrl).respond(201);
     });
 
@@ -70,8 +73,6 @@ describe('AdminCounriesController', function() {
 
   describe('$scope.destroy', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectDELETE(countryAPIUrl + '/' + stubCountry.objectId).respond(200);
     });
 
@@ -99,11 +100,6 @@ describe('AdminCounriesController', function() {
   });
 
   describe('$scope.edit', function() {
-    beforeEach(function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-    });
-
     it('puts country to backup storage', function() {
       expect($scope.backupCountriesCollection.length).toBe(0);
       $scope.edit(0, $scope.countries[0])
@@ -119,8 +115,6 @@ describe('AdminCounriesController', function() {
 
   describe('$scope.update', function(){
     beforeEach(function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectPUT(countryAPIUrl + '/' + stubCountry.objectId).respond(200);      
     });
 
@@ -144,8 +138,6 @@ describe('AdminCounriesController', function() {
 
   describe('$scope.cancelEdit', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $scope.edit(0, $scope.countries[0])
     });
 
@@ -165,9 +157,6 @@ describe('AdminCounriesController', function() {
 
   describe('$scope.cancelNewCountry', function() {
     it('expects $scope.showForm value is true and attributes are null', function() {
-      $httpBackend.whenGET(countryAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-      
       $scope.new();
       $scope.newCountry = 'NewTitle';
       $scope.stars = 4;

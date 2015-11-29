@@ -10,18 +10,36 @@ describe('AdminToursController', function() {
   var stubHotel = null;
   var stubCountry = null;
   var stubPlace = null;
+  var Tour = null;
+  var Country = null;
+  var Hotel = null;
+  var Place = null;
 
-  beforeEach(inject(function($controller, _$httpBackend_) {
-  	$controller('AdminToursController', {$scope: $scope});
-  	$httpBackend = _$httpBackend_;
-  	stubHotel = {title: 'Test Hotel', stars: 5, objectId: 1};
-  	stubCountry = {name: 'Belarus', objectId: 1};
-  	stubPlace = {name: 'Test Place', objectId: 1};
-  	stubTour = {title: 'Test tour', description: 'Test description', price: 2, objectId: 1,  country: stubCountry, hotel: stubHotel, place: stubPlace, duration: 20};
-    tourJsonResponse = JSON.stringify({results: [stubTour]});
-	  $httpBackend.whenGET(countryAPIUrl).respond(200, JSON.stringify({results: [stubCountry]}));
-	  $httpBackend.whenGET(placeAPIUrl).respond(200, JSON.stringify({results: [stubPlace]}));
-	  $httpBackend.whenGET(hotelAPIUrl).respond(200, JSON.stringify({results: [stubHotel]}));
+  beforeEach(inject(function($controller, _$httpBackend_, _Tour_, _Country_, _Hotel_, _Place_) {
+    $httpBackend = _$httpBackend_;
+    Tour = _Tour_;
+    Country = _Country_;
+    Hotel = _Hotel_;
+    Place = _Place_;
+
+    stubHotel = {title: 'Test Hotel', stars: 5, objectId: 1};
+    stubHotels = [stubHotel];
+
+    stubCountry = {name: 'Belarus', objectId: 1};
+    stubCountries = [stubCountry];
+
+    stubPlace = {name: 'Test Place', objectId: 1};
+    stubPlaces = [stubPlace];
+
+    stubTour = {title: 'Test tour', description: 'Test description', price: 2, objectId: 1,  country: stubCountry, hotel: stubHotel, place: stubPlace, duration: 20};
+    stubTours = [stubTour];
+
+    spyOn(Tour, 'query').and.returnValue(stubTours);
+    spyOn(Country, 'query').and.returnValue(stubCountries);
+    spyOn(Hotel, 'query').and.returnValue(stubHotels);
+    spyOn(Place, 'query').and.returnValue(stubPlaces);
+
+    $controller('AdminToursController', {$scope: $scope, Tour: Tour, Country: Country, Hotel: Hotel, Place: Place});
   }));
 
   describe('initialize', function() {
@@ -30,9 +48,6 @@ describe('AdminToursController', function() {
   	});
 
     it('sets countries, places, tours arrays', function() {
-  	  $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-  	  $httpBackend.flush();
-
   	  expect(angular.equals($scope.tours[0], stubTour)).toBeTruthy();
   	  expect(angular.equals($scope.places[0], stubPlace)).toBeTruthy();
   	  expect(angular.equals($scope.countries[0], stubCountry)).toBeTruthy();
@@ -41,7 +56,7 @@ describe('AdminToursController', function() {
 
   describe('$scope.new', function() {
   	it('sets newTour attributes to be null', function() {
-	  $scope.new();
+  	  $scope.new();
   	  expect($scope.newTour.title).toBeNull();
   	  expect($scope.newTour.description).toBeNull();
   	  expect($scope.newTour.price).toBeNull();
@@ -58,15 +73,10 @@ describe('AdminToursController', function() {
   });
 
   describe('$scope.create', function() {
-    beforeEach(function() {
-      $httpBackend.whenGET(hotelAPIUrl).respond(200, '[]');
-      $httpBackend.whenGET(tourAPIUrl).respond(200, '[]');
-    });
-
     it('expects 2 POST request to parse.com create point', function() {
       $httpBackend.expectPOST(hotelAPIUrl).respond(201);
       $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
-      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);      
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, stubTour);      
 	    
       $scope.create();
       $httpBackend.flush();
@@ -94,7 +104,7 @@ describe('AdminToursController', function() {
     it('expects "push" function is called', function() {
       $httpBackend.expectPOST(hotelAPIUrl).respond(201);
       $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
-      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, stubTour);
 
       spyOn($scope.hotels, 'push')
 	    spyOn($scope.tours, 'push')
@@ -110,7 +120,7 @@ describe('AdminToursController', function() {
     it('adds new hotel and tour to $scope', function() {
       $httpBackend.expectPOST(hotelAPIUrl).respond(201);
       $httpBackend.expectPOST(tourAPIUrl).respond(201, {"objectId":"1"});
-      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, stubTour);
 
 	    $scope.create();
       $httpBackend.flush();
@@ -123,8 +133,6 @@ describe('AdminToursController', function() {
 
   describe('$scope.destroy', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectDELETE('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200);
     });
 
@@ -150,32 +158,26 @@ describe('AdminToursController', function() {
       
       expect($scope.tours.length).toBe(0);
     });
-
-    describe('$scope.edit', function() {
-      beforeEach(function() {
-        $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-      });
-
-      it('puts tour to backup storage', function() {
-        expect($scope.backupToursCollection.length).toBe(0);
-        $scope.edit(0, $scope.tours[0])
-        expect($scope.backupToursCollection.length).toBeGreaterThan(0);
-      });
-
-      it('sets tour.isModified attribute to true value', function() {
-        $scope.edit(0, $scope.tours[0])
-        expect($scope.tours[0].isModified).toBeDefined();
-        expect($scope.tours[0].isModified).toBeTruthy();
-      });
-  	});
   });
+    
+  describe('$scope.edit', function() {
+    it('puts tour to backup storage', function() {
+      expect($scope.backupToursCollection.length).toBe(0);
+      $scope.edit(0, $scope.tours[0])
+      expect($scope.backupToursCollection.length).toBeGreaterThan(0);
+    });
+
+    it('sets tour.isModified attribute to true value', function() {
+      $scope.edit(0, $scope.tours[0])
+      expect($scope.tours[0].isModified).toBeDefined();
+      expect($scope.tours[0].isModified).toBeTruthy();
+    });
+	});
 
   describe('$scope.update', function(){
     beforeEach(function() {
-      $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectPUT('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200);      
-      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, tourJsonResponse);	
+      $httpBackend.expectGET('https://api.parse.com/1/classes/tours/1?include=country,hotel,place').respond(200, stubTour);	
       $scope.tours[0].newPlaceId = stubPlace.objectId
       $scope.tours[0].newCountryId = stubCountry.objectId
       $scope.tours[0].newHotelId = stubHotel.objectId
@@ -215,13 +217,11 @@ describe('AdminToursController', function() {
 
   describe('$scope.cancelEdit', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-      $httpBackend.flush();
       $scope.edit(0, $scope.tours[0])
     });
 
     it('expects restore hotel attributes values', function() {
-	  $scope.tours[0].title = 'NewTitle';
+  	  $scope.tours[0].title = 'NewTitle';
       $scope.tours[0].description = 'New Description';
       $scope.tours[0].price = 1000;
       $scope.tours[0].duration = 50;
@@ -249,9 +249,6 @@ describe('AdminToursController', function() {
 
   describe('$scope.cancelNewTour', function() {
   	it('expects $scope.showForm value is true and attributes are null', function() {
-      $httpBackend.whenGET(tourAPIUrl).respond(200, tourJsonResponse);
-      $httpBackend.flush();
-      
       $scope.new();
       $scope.newTour.title = 'NewTitle';
       $scope.newTour.description = 'New Description';

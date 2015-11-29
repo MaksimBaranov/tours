@@ -1,9 +1,7 @@
-angular.module('toursModule').controller('TourController', function($scope, $routeParams, $resource){
-
-  var Tour = $resource(
- 	'https://api.parse.com/1/classes/tours/:objectId?include=hotel',
- 	{objectId: '@objectId'}
-  )
-
+angular.module('toursModule').controller('TourController', function($scope, $routeParams, Tour){
   $scope.tour = Tour.get({objectId: $routeParams.id})
+
+  $scope.imageTourRender = function(tour){
+    return tour.image ? tour.image.url : '/assets/img/foto_not_found.jpeg'
+  }
 });

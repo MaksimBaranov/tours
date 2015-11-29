@@ -1,17 +1,6 @@
-angular.module('toursModule').controller('AdminHotelsController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminHotelsController', function($scope, Hotel){
   $scope.pageName = 'Admin Hotels';
-
-  var Hotel = $resource(
-    'https://api.parse.com/1/classes/hotels/:objectId',
-    {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults},
-      update: {method: 'PUT'}
-    }
-  );
-
   $scope.hotels = Hotel.query();
-
   $scope.backupHotelsCollection = [];
 
   // CRUD actions

@@ -1,17 +1,6 @@
-angular.module('toursModule').controller('AdminCountriesController', function($scope, $location, $resource){
+angular.module('toursModule').controller('AdminCountriesController', function($scope, Country){
   $scope.pageName = 'Admin Countries';
-
-  var Country = $resource(
-    'https://api.parse.com/1/classes/countries/:objectId',
-    {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults},
-      update: {method: 'PUT'}
-    }
-  );
-
   $scope.countries = Country.query();
-
   $scope.backupCountriesCollection = [];
 
   // CRUD actions
@@ -61,11 +50,6 @@ angular.module('toursModule').controller('AdminCountriesController', function($s
   };
 
   // Actions' helpers
-  function parseServerResults(data, headerGetter) {
-    data = angular.fromJson(data);
-    return data.results;
-  };
-
   function emptyCountry() {
     return {
       name: null,

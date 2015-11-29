@@ -1,33 +1,5 @@
-angular.module('toursModule').controller('AdminToursController', function($scope, $location, $resource, $http){
+angular.module('toursModule').controller('AdminToursController', function($scope, $http, Tour, Country, Hotel, Place){
   $scope.pageName = 'Admin Tours';
-  
-  var Tour = $resource(
-    'https://api.parse.com/1/classes/tours/:objectId?include=country,hotel,place',
-    {objectId: '@objectId'},
-    {
-      query: {isArray: true, transformResponse: parseServerResults},
-      update: {method: 'PUT'}
-    }
-  );
-
-  var Country = $resource(
-    'https://api.parse.com/1/classes/countries/:objectId',
-    {objectId: '@objectId'},
-    {query: {isArray: true, transformResponse: parseServerResults}}
-  );
-
-  var Place = $resource(
-    'https://api.parse.com/1/classes/places/:objectId',
-    {objectId: '@objectId'},
-    {query: {isArray: true, transformResponse: parseServerResults}}
-  );
-
-  var Hotel = $resource(
-    'https://api.parse.com/1/classes/hotels/:objectId',
-    {objectId: '@objectId'},
-    {query: {isArray: true, transformResponse: parseServerResults}}
-  );
-
   $scope.tours = Tour.query();
   $scope.countries = Country.query();
   $scope.places = Place.query();
@@ -111,13 +83,11 @@ angular.module('toursModule').controller('AdminToursController', function($scope
   };
 
   $scope.uploadImage = function(file, tour) {
-    // $scope.processingUpload = true;
     $http.post('https://api.parse.com/1/files/'+file.name, file, {
       transformRequest: angular.identity
     }).then(function(data) {
       data = angular.fromJson(data);
       tour.image = { __type: 'File', name: data.data.name, url: data.data.url }
-    // $scope.processingUpload = false;
     });
   }
 
@@ -133,15 +103,10 @@ angular.module('toursModule').controller('AdminToursController', function($scope
   };
 
   $scope.imageTourRender = function(tour){
-    return tour.image != undefined ? tour.image.url : '/assets/img/foto_not_found.jpeg'
+    return tour.image ? tour.image.url : '/assets/img/foto_not_found.jpeg'
   }
 
   // Actions' helpers
-  function parseServerResults(data, headerGetter) {
-    data = angular.fromJson(data);
-    return data.results;
-  };
-
   function loadNewTour(tour) {
     Tour.get({objectId: tour.objectId}, function(tourFromServer) {
       angular.extend(tour, tourFromServer);
