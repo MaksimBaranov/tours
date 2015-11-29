@@ -2,6 +2,6 @@ angular.module('toursModule').controller('TourController', function($scope, $rou
   $scope.tour = Tour.get({objectId: $routeParams.id})
 
   $scope.imageTourRender = function(tour){
-    return tour.image != undefined ? tour.image.url : '/assets/img/foto_not_found.jpeg'
+    return tour.image ? tour.image.url : '/assets/img/foto_not_found.jpeg'
   }
 });

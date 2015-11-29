@@ -7,6 +7,6 @@ angular.module('toursModule').controller('ToursController', function($scope, $re
   $scope.places = Place.query();
 
   $scope.imageTourRender = function(tour){
-    return tour.image != undefined ? tour.image.url : '/assets/img/foto_not_found.jpeg'
+    return tour.image ? tour.image.url : '/assets/img/foto_not_found.jpeg'
   }
 });
