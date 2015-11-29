@@ -4,14 +4,20 @@ describe('AdminPlacesController', function() {
   var $scope = {};
   var placeAPIUrl = 'https://api.parse.com/1/classes/places';
   var $httpBackend = null;
+  var Place = null;
   var stubPlace = null;
-  var jsonResponse = null;
+  var stubPlaces = null;
 
-  beforeEach(inject(function($controller, _$httpBackend_) {
-  	$controller('AdminPlacesController', {$scope: $scope});
+  beforeEach(inject(function($controller, _$httpBackend_, _Place_) {
+    Place = _Place_;
   	$httpBackend = _$httpBackend_;
+
     stubPlace = {name: 'Test Place', objectId: 1};
-    jsonResponse = JSON.stringify({results: [stubPlace]});
+    stubPlaces = [stubPlace];
+
+    spyOn(Place, 'query').and.returnValue(stubPlaces);
+
+    $controller('AdminPlacesController', {$scope: $scope, Place: Place});
   }));
 
   describe('initialize controller', function() {
@@ -20,9 +26,6 @@ describe('AdminPlacesController', function() {
   	});
 
     it('sets $scope.places an array of places', function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-
       expect($scope.places.length).toBe(1);
       expect($scope.places[0].name).toBe(stubPlace.name);
     });
@@ -42,7 +45,6 @@ describe('AdminPlacesController', function() {
 
   describe('$scope.create', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(placeAPIUrl).respond('[]');
       $httpBackend.expectPOST(placeAPIUrl).respond(201);
     });
 
@@ -63,15 +65,13 @@ describe('AdminPlacesController', function() {
     it('adds new place object to $scope.places', function() {
       $scope.create();
       $httpBackend.flush();
-      expect($scope.places.length).toBeGreaterThan(0);
+      expect($scope.places.length).toBeGreaterThan(1);
       expect($httpBackend.verifyNoOutstandingExpectation).not.toThrow();
     });
   });
 
   describe('$scope.destroy', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectDELETE(placeAPIUrl + '/' + stubPlace.objectId).respond(200);
     });
 
@@ -99,11 +99,6 @@ describe('AdminPlacesController', function() {
   });
 
   describe('$scope.edit', function() {
-    beforeEach(function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-    });
-
     it('puts place to backup storage', function() {
       expect($scope.backupPlacesCollection.length).toBe(0);
       $scope.edit(0, $scope.places[0])
@@ -119,8 +114,6 @@ describe('AdminPlacesController', function() {
 
   describe('$scope.update', function(){
     beforeEach(function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $httpBackend.expectPUT(placeAPIUrl + '/' + stubPlace.objectId).respond(200);      
     });
 
@@ -146,8 +139,6 @@ describe('AdminPlacesController', function() {
 
   describe('$scope.cancelEdit', function() {
     beforeEach(function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
       $scope.edit(0, $scope.places[0])
     });
 
@@ -169,9 +160,6 @@ describe('AdminPlacesController', function() {
 
   describe('$scope.cancelNewPlace', function() {
     it('expects $scope.showForm value is true and attributes are null', function() {
-      $httpBackend.whenGET(placeAPIUrl).respond(200, jsonResponse);
-      $httpBackend.flush();
-      
       $scope.new();
       $scope.newPlace.name = 'NewTitle';
       $scope.stars = 4;
